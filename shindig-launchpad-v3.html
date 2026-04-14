@@ -277,7 +277,7 @@ nav.scrolled{background:rgba(10,10,10,0.97);border-bottom:1px solid rgba(255,255
 
 <div class="tiles">
 
-  <a class="tile" href="#">
+  <a class="tile" href="https://shindigmedia.com/collections/all" target="_blank">
     <div class="tile-accent"></div>
     <div class="tile-content"><div class="tile-icon">
         <!-- Shopping bag -->
@@ -351,12 +351,12 @@ nav.scrolled{background:rgba(10,10,10,0.97);border-bottom:1px solid rgba(255,255
 </div>
 
 <div class="shop">
-  <div class="shop-header"><div class="shop-title">Shop</div><a class="shop-all" href="#">View all →</a></div>
-  <div class="product-grid">
-    <div class="product"><div class="pimg"><div class="pimg-inner"><span class="pimg-ph">Product image</span></div><span class="product-new">New</span></div><div class="product-info"><span class="product-name">Shin Dig Heavy Tee</span><span class="product-price">£32.00</span></div></div>
-    <div class="product"><div class="pimg"><div class="pimg-inner"><span class="pimg-ph">Product image</span></div><span class="product-new">New</span></div><div class="product-info"><span class="product-name">Trials Club Hoodie</span><span class="product-price">£58.00</span></div></div>
-    <div class="product"><div class="pimg"><div class="pimg-inner"><span class="pimg-ph">Product image</span></div></div><div class="product-info"><span class="product-name">Block Logo Tee</span><span class="product-price">£28.00</span></div></div>
-    <div class="product"><div class="pimg"><div class="pimg-inner"><span class="pimg-ph">Product image</span></div></div><div class="product-info"><span class="product-name">Shin Dig Cap</span><span class="product-price">£22.00</span></div></div>
+  <div class="shop-header"><div class="shop-title">Shop</div><a class="shop-all" href="https://shindigmedia.com/collections/all" target="_blank">View all →</a></div>
+  <div class="product-grid" id="product-grid">
+    <div class="product"><div class="pimg"><div class="pimg-inner"><span class="pimg-ph">Loading…</span></div></div><div class="product-info"><span class="product-name">Loading…</span><span class="product-price"></span></div></div>
+    <div class="product"><div class="pimg"><div class="pimg-inner"><span class="pimg-ph">Loading…</span></div></div><div class="product-info"><span class="product-name">Loading…</span><span class="product-price"></span></div></div>
+    <div class="product"><div class="pimg"><div class="pimg-inner"><span class="pimg-ph">Loading…</span></div></div><div class="product-info"><span class="product-name">Loading…</span><span class="product-price"></span></div></div>
+    <div class="product"><div class="pimg"><div class="pimg-inner"><span class="pimg-ph">Loading…</span></div></div><div class="product-info"><span class="product-name">Loading…</span><span class="product-price"></span></div></div>
   </div>
 </div>
 
@@ -679,6 +679,85 @@ function buildEventRow(date, title, url, isLive, isPast) {
 }
 
 fetchEvents();
+
+// Shopify Storefront API Integration
+const SHOPIFY_DOMAIN = 'the-shin-dig.myshopify.com';
+const STOREFRONT_TOKEN = '81d843e6b967eeb575943e7f9389e958';
+
+async function fetchShopifyProducts() {
+  const grid = document.getElementById('product-grid');
+
+  try {
+    const res = await fetch(`https://${SHOPIFY_DOMAIN}/api/2024-01/graphql.json`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Shopify-Storefront-Access-Token': STOREFRONT_TOKEN
+      },
+      body: JSON.stringify({
+        query: `{
+          products(first: 8, sortKey: CREATED_AT, reverse: true) {
+            edges {
+              node {
+                title
+                handle
+                availableForSale
+                priceRange {
+                  minVariantPrice {
+                    amount
+                    currencyCode
+                  }
+                }
+                images(first: 1) {
+                  edges {
+                    node {
+                      url
+                      altText
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }`
+      })
+    });
+
+    const json = await res.json();
+    const products = json.data.products.edges;
+
+    if (products.length === 0) {
+      grid.innerHTML = '<p style="color:rgba(255,255,255,0.3);padding:24px;">No products found</p>';
+      return;
+    }
+
+    grid.innerHTML = '';
+    for (const { node: p } of products) {
+      const imgUrl = p.images.edges[0]?.node.url || '';
+      const price = parseFloat(p.priceRange.minVariantPrice.amount);
+      const currency = p.priceRange.minVariantPrice.currencyCode === 'GBP' ? '£' : '$';
+      const soldOut = !p.availableForSale;
+      const url = `https://shindigmedia.com/products/${p.handle}`;
+
+      grid.innerHTML += `<a class="product" href="${url}" target="_blank" style="text-decoration:none;color:inherit;">
+        <div class="pimg">
+          <div class="pimg-inner" style="${imgUrl ? `background-image:url(${imgUrl});background-size:cover;background-position:center;` : ''}">
+            ${imgUrl ? '' : '<span class="pimg-ph">No image</span>'}
+          </div>
+          ${soldOut ? '<span class="product-new" style="background:rgba(255,255,255,0.15);color:rgba(255,255,255,0.5);">Sold Out</span>' : ''}
+        </div>
+        <div class="product-info">
+          <span class="product-name">${p.title.replace('The Shin Dig - ','').replace('The Shin Dig ','')}</span>
+          <span class="product-price">${currency}${price.toFixed(2)}</span>
+        </div>
+      </a>`;
+    }
+  } catch (e) {
+    grid.innerHTML = '<p style="color:rgba(255,255,255,0.3);padding:24px;">Unable to load products</p>';
+  }
+}
+
+fetchShopifyProducts();
 </script>
 
 </body>
