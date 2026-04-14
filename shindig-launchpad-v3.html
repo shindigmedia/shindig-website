@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Shin Dig</title>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=Barlow+Condensed:wght@400;600;700&family=Barlow:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:#0a0a0a;color:#f0f0f0;font-family:'Barlow',sans-serif;overflow-x:hidden;width:100%;}
+
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 32px;height:52px;
+  background:linear-gradient(to bottom,rgba(10,10,10,0.8) 0%,transparent 100%);
+  transition:background 0.3s;
+}
+nav.scrolled{background:rgba(10,10,10,0.97);border-bottom:1px solid rgba(255,255,255,0.07);}
+.nav-logo{height:32px;width:auto;}
+.nav-links{display:flex;gap:28px;list-style:none;}
+.nav-links a{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.5);text-decoration:none;transition:color 0.15s;}
+.nav-links a:hover{color:#fff;}
+
+/* HERO */
+.hero{position:relative;height:100vh;min-height:600px;max-height:900px;overflow:hidden;}
+.hero-slides{position:absolute;inset:0;}
+.slide{position:absolute;inset:0;opacity:0;transition:opacity 1.2s cubic-bezier(0.4,0,0.2,1);}
+.slide.active{opacity:1;}
+.slide img{width:100%;height:100%;object-fit:cover;object-position:center 35%;display:block;filter:brightness(0.6) contrast(1.08) saturate(0.85);transform:scale(1.04);transition:transform 8s cubic-bezier(0.1,0,0.1,1);}
+.slide.active img{transform:scale(1);}
+.hero-grad-bottom{position:absolute;inset:0;z-index:2;background:linear-gradient(to top,rgba(10,10,10,1) 0%,rgba(10,10,10,0.65) 22%,rgba(10,10,10,0.1) 55%,transparent 100%);pointer-events:none;}
+.hero-grad-sides{position:absolute;inset:0;z-index:2;background:linear-gradient(to right,rgba(10,10,10,0.55) 0%,transparent 45%,transparent 55%,rgba(10,10,10,0.3) 100%);pointer-events:none;}
+.hero-grain{position:absolute;inset:0;z-index:3;opacity:0.04;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");pointer-events:none;}
+.hero-content{position:absolute;bottom:0;left:0;right:0;z-index:4;padding:0 36px 44px;}
+.hero-logo{width:min(640px,78vw);height:auto;display:block;filter:drop-shadow(0 2px 24px rgba(0,0,0,0.9)) drop-shadow(0 0 60px rgba(230,50,38,0.1));margin-bottom:10px;}
+.hero-tagline{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:0.22em;text-transform:uppercase;color:rgba(255,255,255,0.3);}
+.hero-dots{position:absolute;bottom:20px;right:32px;z-index:5;display:flex;gap:6px;align-items:center;}
+.dot{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,0.25);cursor:pointer;transition:background 0.2s,transform 0.2s;}
+.dot.active{background:#e63226;transform:scale(1.3);}
+
+.tiles{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  grid-auto-rows:220px;
+  gap:2px;
+}
+.tile{
+  position:relative;
+  padding:28px 24px 26px;
+  background:#111;
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+  text-decoration:none;color:inherit;
+  cursor:pointer;
+  transition:background 0.25s;
+}
+.tile:hover{background:#161616;}
+.tile-accent{
+  position:absolute;top:0;left:0;right:0;height:2px;
+  background:#e63226;transform:scaleX(0);transform-origin:left;
+  transition:transform 0.35s cubic-bezier(0.22,1,0.36,1);
+}
+.tile:hover .tile-accent{transform:scaleX(1);}
+.tile-content{
+  display:flex;flex-direction:column;
+  flex:1;
+  min-height:0;
+}
+.tile-icon{
+  flex-shrink:0;
+  width:32px;height:32px;
+  overflow:hidden;
+  color:rgba(255,255,255,0.18);
+  transition:color 0.2s;
+}
+.tile-icon svg{
+  width:32px !important;
+  height:32px !important;
+  display:block;
+  overflow:hidden;
+}
+.tile:hover .tile-icon{color:#e63226;}
+.tile-spacer{flex:1;}
+.tile-label{
+  font-family:'Oswald',sans-serif;
+  font-size:24px;font-weight:700;
+  text-transform:uppercase;letter-spacing:0.04em;
+  color:#fff;display:block;
+  margin-bottom:5px;
+  transition:color 0.2s;
+}
+.tile:hover .tile-label{color:#e63226;}
+.tile-meta{
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:13px;font-weight:600;
+  letter-spacing:0.08em;text-transform:uppercase;
+  color:rgba(255,255,255,0.28);display:block;
+  margin-bottom:12px;line-height:1.5;
+}
+.tile-arrow{
+  font-size:16px;color:rgba(255,255,255,0.18);
+  transition:transform 0.25s cubic-bezier(0.22,1,0.36,1),color 0.2s;
+  display:inline-block;
+}
+.tile:hover .tile-arrow{transform:translate(4px,-4px);color:#fff;}
+
+/* SHOP */
+.shop{padding:48px 32px 64px;}
+.shop-header{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:24px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,0.07);}
+.shop-title{font-family:'Oswald',sans-serif;font-size:13px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:#fff;display:flex;align-items:center;gap:10px;}
+.shop-title::before{content:'';display:block;width:3px;height:13px;background:#e63226;}
+.shop-all{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.3);text-decoration:none;transition:color 0.15s;}
+.shop-all:hover{color:#fff;}
+.product-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:2px;}
+.product{cursor:pointer;background:#0f0f0f;}
+.product:hover .pimg-inner{transform:scale(1.03);}
+.product:hover .product-name{color:#e63226;}
+.pimg{aspect-ratio:3/4;overflow:hidden;background:#141414;position:relative;}
+.pimg-inner{width:100%;height:100%;min-height:0;background:#161616;background-image:repeating-linear-gradient(-45deg,rgba(255,255,255,0.015) 0px,rgba(255,255,255,0.015) 1px,transparent 1px,transparent 10px);transition:transform 0.4s cubic-bezier(0.22,1,0.36,1);display:flex;align-items:center;justify-content:center;}
+.pimg-ph{font-family:'Barlow Condensed',sans-serif;font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:rgba(255,255,255,0.07);}
+.product-new{position:absolute;top:10px;left:10px;font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;background:#e63226;color:#fff;padding:3px 7px;}
+.product-info{padding:11px 12px 14px;}
+.product-name{font-family:'Oswald',sans-serif;font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:#fff;display:block;margin-bottom:3px;transition:color 0.2s;}
+.product-price{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;color:rgba(255,255,255,0.32);}
+
+/* EVENTS */
+.events{padding:48px 32px 56px;border-top:1px solid rgba(255,255,255,0.05);}
+.events-header{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:24px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,0.07);}
+.events-title{font-family:'Oswald',sans-serif;font-size:13px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:#fff;display:flex;align-items:center;gap:10px;}
+.events-title::before{content:'';display:block;width:3px;height:13px;background:#e63226;}
+.events-list{display:flex;flex-direction:column;gap:2px;}
+.event-row{display:flex;align-items:center;gap:20px;padding:18px 20px;background:#111;transition:background 0.25s;cursor:pointer;text-decoration:none;color:inherit;}
+.event-row:hover{background:#161616;}
+.event-date-box{flex-shrink:0;width:56px;text-align:center;}
+.event-day{font-family:'Oswald',sans-serif;font-size:28px;font-weight:700;color:#e63226;display:block;line-height:1;}
+.event-month{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.4);display:block;margin-top:2px;}
+.event-info{flex:1;min-width:0;}
+.event-name{font-family:'Oswald',sans-serif;font-size:18px;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;color:#fff;display:block;margin-bottom:3px;transition:color 0.2s;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.event-row:hover .event-name{color:#e63226;}
+.event-time{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:rgba(255,255,255,0.28);display:block;}
+.event-arrow{font-size:16px;color:rgba(255,255,255,0.18);transition:transform 0.25s cubic-bezier(0.22,1,0.36,1),color 0.2s;}
+.event-row:hover .event-arrow{transform:translate(4px,-4px);color:#fff;}
+.event-empty{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:rgba(255,255,255,0.25);padding:24px 20px;background:#111;text-align:center;}
+.event-live-badge{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;background:#e63226;color:#fff;padding:3px 7px;margin-left:10px;flex-shrink:0;}
+
+/* LATEST VIDEO */
+.latest-video{padding:48px 32px 56px;border-top:1px solid rgba(255,255,255,0.05);}
+.latest-video-header{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:24px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,0.07);}
+.latest-video-title{font-family:'Oswald',sans-serif;font-size:13px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:#fff;display:flex;align-items:center;gap:10px;}
+.latest-video-title::before{content:'';display:block;width:3px;height:13px;background:#e63226;}
+.latest-video-card{cursor:pointer;background:#111;overflow:hidden;transition:background 0.25s;position:relative;}
+.latest-video-card:hover{background:#161616;}
+.latest-video-thumb{width:100%;aspect-ratio:16/9;background:#141414;background-size:cover;background-position:center;position:relative;overflow:hidden;}
+.latest-video-thumb::after{content:'▶';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:56px;height:56px;background:rgba(230,50,38,0.9);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;color:#fff;padding-left:3px;opacity:0;transition:opacity 0.25s;}
+.latest-video-card:hover .latest-video-thumb::after{opacity:1;}
+.latest-video-info{padding:16px 18px 20px;}
+.latest-video-name{font-family:'Oswald',sans-serif;font-size:20px;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;color:#fff;display:block;margin-bottom:5px;transition:color 0.2s;}
+.latest-video-card:hover .latest-video-name{color:#e63226;}
+.latest-video-date{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:rgba(255,255,255,0.28);display:block;}
+
+/* PARTNERS */
+.partners{padding:48px 32px 56px;border-top:1px solid rgba(255,255,255,0.05);}
+.partners-header{margin-bottom:24px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,0.07);}
+.partners-title{font-family:'Oswald',sans-serif;font-size:13px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:#fff;display:flex;align-items:center;gap:10px;}
+.partners-title::before{content:'';display:block;width:3px;height:13px;background:#e63226;}
+.partners-strip{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:32px 48px;padding:16px 0;}
+.partner-logo{font-family:'Oswald',sans-serif;font-size:26px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:rgba(255,255,255,0.15);transition:color 0.25s;cursor:default;white-space:nowrap;}
+.partner-logo:hover{color:rgba(255,255,255,0.5);}
+.partner-logo-img{height:56px;width:auto;max-width:200px;object-fit:contain;opacity:0.2;filter:brightness(0) invert(1);transition:opacity 0.25s;cursor:default;}
+.partner-logo-img:hover{opacity:0.6;}
+.partner-logo-img.logo-wide{height:48px;max-width:220px;}
+.partner-logo-img.logo-tall{height:64px;}
+
+/* FOOTER */
+.site-footer{padding:40px 32px 48px;border-top:1px solid rgba(255,255,255,0.07);text-align:center;}
+.footer-socials{display:flex;justify-content:center;gap:24px;margin-bottom:16px;}
+.footer-socials a{display:block;width:22px;height:22px;color:rgba(255,255,255,0.3);transition:color 0.2s;}
+.footer-socials a:hover{color:#e63226;}
+.footer-socials svg{width:22px;height:22px;}
+.footer-copy{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.15);}
+
+.live-pulse{color:#e63226 !important;}
+.live-pulse::before{content:'';display:inline-block;width:8px;height:8px;background:#e63226;border-radius:50%;margin-right:8px;vertical-align:middle;animation:pulse 1.5s ease-in-out infinite;}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.4;transform:scale(0.8);}}
+
+@media(max-width:1024px){
+  .tiles{grid-template-columns:repeat(2,1fr);}
+  .product-grid{grid-template-columns:repeat(2,1fr);}
+}
+@media(max-width:600px){
+  /* Nav */
+  nav{padding:0 16px;height:48px;}
+  .nav-logo{height:26px;}
+  .nav-links{gap:16px;}
+  .nav-links a{font-size:11px;letter-spacing:0.08em;}
+
+  /* Hero */
+  .hero{min-height:400px;max-height:600px;}
+  .hero-content{padding:0 20px 28px;}
+  .hero-logo{width:min(400px,85vw);}
+  .hero-tagline{font-size:10px;}
+  .hero-dots{right:16px;bottom:14px;}
+
+  /* Tiles */
+  .tiles{grid-template-columns:1fr;grid-auto-rows:180px;}
+  .tile{padding:22px 20px 20px;}
+  .tile-label{font-size:20px;}
+
+  /* Shop */
+  .shop{padding:32px 16px 40px;}
+  .product-grid{grid-template-columns:repeat(2,1fr);}
+  .product-name{font-size:12px;}
+  .product-price{font-size:11px;}
+
+  /* Partners */
+  .partners{padding:32px 16px 40px;}
+  .partners-strip{gap:20px 32px;justify-content:center;}
+  .partner-logo{font-size:20px;}
+  .partner-logo-img{height:40px;}
+  .partner-logo-img.logo-wide{height:36px;}
+  .partner-logo-img.logo-tall{height:48px;}
+
+  /* Latest Video */
+  .latest-video{padding:32px 16px 40px;}
+  .latest-video-name{font-size:16px;}
+
+  /* Events */
+  .events{padding:32px 16px 40px;}
+  .event-row{padding:14px 16px;gap:14px;}
+  .event-day{font-size:24px;}
+  .event-name{font-size:15px;}
+
+  /* Footer */
+  .site-footer{padding:32px 16px 40px;}
+
+  /* Section headers */
+  .shop-header,.events-header,.latest-video-header,.partners-header{margin-bottom:18px;padding-bottom:10px;}
+}
+</style>
+</head>
+<body>
+
+<nav id="nav">
+  <a href="shindig-launchpad-v3.html"><img class="nav-logo" src="logo-square.png" alt="The Shin Dig"></a>
+  <ul class="nav-links">
+    <li><a href="about.html">About</a></li>
+    <li><a href="https://shindigmedia.com/collections/all" target="_blank">Shop</a></li>
+    <li><a href="faq.html">FAQ</a></li>
+  </ul>
+</nav>
+
+<div class="hero">
+  <div class="hero-slides" id="slides">
+    <div class="slide active"><img src="img-hero1.jpg" alt=""></div>
+    <div class="slide"><img src="img-hero2.jpg" alt=""></div>
+    <div class="slide"><img src="img-hero3.jpg" alt=""></div>
+    <div class="slide"><img src="img-hero4.jpg" alt=""></div>
+    <div class="slide"><img src="img-hero5.jpg" alt=""></div>
+  </div>
+  <div class="hero-grad-bottom"></div>
+  <div class="hero-grad-sides"></div>
+  <div class="hero-grain"></div>
+  <div class="hero-content">
+    <img class="hero-logo" src="logo-long.png" alt="The Shin Dig">
+    <span class="hero-tagline">Home of Bike Trials</span>
+  </div>
+  <div class="hero-dots" id="dots">
+    <div class="dot active" onclick="goTo(0)"></div>
+    <div class="dot" onclick="goTo(1)"></div>
+    <div class="dot" onclick="goTo(2)"></div>
+    <div class="dot" onclick="goTo(3)"></div>
+    <div class="dot" onclick="goTo(4)"></div>
+  </div>
+</div>
+
+<div class="tiles">
+
+  <a class="tile" href="#">
+    <div class="tile-accent"></div>
+    <div class="tile-content"><div class="tile-icon">
+        <!-- Shopping bag -->
+        <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M14 8C14 8 16 4 24 4C32 4 34 8 34 8" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+          <path d="M8 14H40L37 42H11L8 14Z" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/>
+          <path d="M18 22V28" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+          <path d="M30 22V28" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="tile-spacer"></div>
+      <span class="tile-label">Shop</span>
+      <span class="tile-meta">Spring 26 drop<br>Tees &amp; hoodies</span>
+      <span class="tile-arrow">↗</span>
+    </div>
+  </a>
+
+  <a class="tile" id="yt-tile" href="https://www.youtube.com/@theshindig" target="_blank">
+    <div class="tile-accent"></div>
+    <div class="tile-content"><div class="tile-icon">
+        <!-- Play / YouTube -->
+        <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="4" y="10" width="40" height="28" rx="6" stroke="currentColor" stroke-width="2.5"/>
+          <path d="M20 17L32 24L20 31V17Z" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="tile-spacer"></div>
+      <span class="tile-label" id="yt-label">YouTube</span>
+      <span class="tile-meta" id="yt-meta">Loading…</span>
+      <span class="tile-arrow">↗</span>
+    </div>
+  </a>
+
+  <a class="tile" id="podcast-tile" href="https://www.youtube.com/playlist?list=PLz_9CwS6R7iKlVFCR313CWKxxsrElfr18" target="_blank">
+    <div class="tile-accent"></div>
+    <div class="tile-content"><div class="tile-icon">
+        <!-- Microphone / Podcast -->
+        <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="16" y="4" width="16" height="24" rx="8" stroke="currentColor" stroke-width="2.5"/>
+          <path d="M8 26C8 35.389 14.268 40 24 40C33.732 40 40 35.389 40 26" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+          <path d="M24 40V44" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+          <path d="M18 44H30" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="tile-spacer"></div>
+      <span class="tile-label" id="podcast-label">Podcast</span>
+      <span class="tile-meta" id="podcast-meta">Loading…</span>
+      <span class="tile-arrow">↗</span>
+    </div>
+  </a>
+
+  <a class="tile" id="live-tile" href="https://www.youtube.com/@theshindig/streams" target="_blank">
+    <div class="tile-accent"></div>
+    <div class="tile-content"><div class="tile-icon">
+        <!-- Live / signal waves -->
+        <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="24" cy="24" r="4" stroke="currentColor" stroke-width="2.5"/>
+          <path d="M14 34C11.0718 31.0718 9 27.2386 9 24C9 20.7614 11.0718 16.9282 14 14" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+          <path d="M34 14C36.9282 16.9282 39 20.7614 39 24C39 27.2386 36.9282 31.0718 34 34" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+          <path d="M8 40C3.58172 36.4183 1 30.5228 1 24C1 17.4772 3.58172 11.5817 8 8" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+          <path d="M40 8C44.4183 11.5817 47 17.4772 47 24C47 30.5228 44.4183 36.4183 40 40" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="tile-spacer"></div>
+      <span class="tile-label" id="live-label">Live</span>
+      <span class="tile-meta" id="live-meta">Loading…</span>
+      <span class="tile-arrow">↗</span>
+    </div>
+  </a>
+
+</div>
+
+<div class="shop">
+  <div class="shop-header"><div class="shop-title">Shop</div><a class="shop-all" href="#">View all →</a></div>
+  <div class="product-grid">
+    <div class="product"><div class="pimg"><div class="pimg-inner"><span class="pimg-ph">Product image</span></div><span class="product-new">New</span></div><div class="product-info"><span class="product-name">Shin Dig Heavy Tee</span><span class="product-price">£32.00</span></div></div>
+    <div class="product"><div class="pimg"><div class="pimg-inner"><span class="pimg-ph">Product image</span></div><span class="product-new">New</span></div><div class="product-info"><span class="product-name">Trials Club Hoodie</span><span class="product-price">£58.00</span></div></div>
+    <div class="product"><div class="pimg"><div class="pimg-inner"><span class="pimg-ph">Product image</span></div></div><div class="product-info"><span class="product-name">Block Logo Tee</span><span class="product-price">£28.00</span></div></div>
+    <div class="product"><div class="pimg"><div class="pimg-inner"><span class="pimg-ph">Product image</span></div></div><div class="product-info"><span class="product-name">Shin Dig Cap</span><span class="product-price">£22.00</span></div></div>
+  </div>
+</div>
+
+<div class="partners">
+  <div class="partners-header"><div class="partners-title">Worked With</div></div>
+  <div class="partners-strip">
+    <img class="partner-logo-img logo-tall" src="logos/red-bull.png" alt="Red Bull">
+    <span class="partner-logo">BBC Sport</span>
+    <span class="partner-logo">Swytch</span>
+    <img class="partner-logo-img logo-wide" src="logos/uci.png" alt="UCI">
+    <img class="partner-logo-img logo-wide" src="logos/uec.png" alt="UEC">
+  </div>
+</div>
+
+<div class="latest-video" id="latest-video-section">
+  <div class="latest-video-header"><div class="latest-video-title">Latest Video</div><a class="shop-all" id="yt-channel-link" href="https://www.youtube.com/@theshindig" target="_blank">View channel →</a></div>
+  <div class="latest-video-card" id="latest-video-card">
+    <div class="latest-video-thumb" id="latest-video-thumb"></div>
+    <div class="latest-video-info">
+      <span class="latest-video-name" id="latest-video-name">Loading…</span>
+      <span class="latest-video-date" id="latest-video-date"></span>
+    </div>
+  </div>
+</div>
+
+<div class="events" id="events-section">
+  <div class="events-header"><div class="events-title">Upcoming Events</div><a class="shop-all" href="https://www.youtube.com/@theshindig/streams" target="_blank">All streams →</a></div>
+  <div class="events-list" id="events-list">
+    <div class="event-empty">Loading…</div>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="footer-socials">
+    <a href="https://www.youtube.com/@theshindig" target="_blank" aria-label="YouTube">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+    </a>
+    <a href="https://www.instagram.com/shindigmedia" target="_blank" aria-label="Instagram">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+    </a>
+    <a href="https://www.facebook.com/theshindigmedia" target="_blank" aria-label="Facebook">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+    </a>
+    <a href="https://www.tiktok.com/@shindigmedia" target="_blank" aria-label="TikTok">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/></svg>
+    </a>
+  </div>
+  <div class="footer-copy">&copy; 2026 Shin Dig Media Ltd. All rights reserved.</div>
+</footer>
+
+<script>
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => nav.classList.toggle('scrolled', window.scrollY > 60));
+
+let current = 0;
+const slides = document.querySelectorAll('.slide');
+const dots = document.querySelectorAll('.dot');
+let timer;
+
+function goTo(n) {
+  slides[current].classList.remove('active');
+  dots[current].classList.remove('active');
+  current = n;
+  slides[current].classList.add('active');
+  dots[current].classList.add('active');
+  clearInterval(timer);
+  timer = setInterval(next, 5000);
+}
+
+function next() { goTo((current + 1) % slides.length); }
+timer = setInterval(next, 5000);
+
+// YouTube Live Stream Integration
+const YT_KEY = 'AIzaSyApQveLGZ_wU1Z2kAvdKXAF7n4oCo3y4Vs';
+const CHANNEL_ID = 'UC1LCSELQgJQw7YBN5ywA8Vg';
+
+async function fetchLiveStatus() {
+  const label = document.getElementById('live-label');
+  const meta = document.getElementById('live-meta');
+  const tile = document.getElementById('live-tile');
+
+  try {
+    // 1. Check if currently live
+    let res = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${CHANNEL_ID}&eventType=live&type=video&key=${YT_KEY}`);
+    let data = await res.json();
+    if (data.items && data.items.length > 0) {
+      const v = data.items[0];
+      label.textContent = 'Live Now';
+      label.classList.add('live-pulse');
+      meta.innerHTML = v.snippet.title;
+      tile.href = 'https://www.youtube.com/watch?v=' + v.id.videoId;
+      return;
+    }
+
+    // 2. Check for upcoming scheduled stream
+    res = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${CHANNEL_ID}&eventType=upcoming&type=video&key=${YT_KEY}`);
+    data = await res.json();
+    if (data.items && data.items.length > 0) {
+      const v = data.items[0];
+      // Get scheduled start time
+      const detailRes = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=liveStreamingDetails&id=${v.id.videoId}&key=${YT_KEY}`);
+      const detailData = await detailRes.json();
+      const startTime = detailData.items[0]?.liveStreamingDetails?.scheduledStartTime;
+
+      label.textContent = 'Next Stream';
+      if (startTime) {
+        const start = new Date(startTime);
+        meta.innerHTML = v.snippet.title + '<br>' + formatCountdown(start);
+        tile.href = 'https://www.youtube.com/watch?v=' + v.id.videoId;
+        // Update countdown every second
+        setInterval(() => {
+          meta.innerHTML = v.snippet.title + '<br>' + formatCountdown(start);
+        }, 1000);
+      } else {
+        meta.innerHTML = v.snippet.title;
+        tile.href = 'https://www.youtube.com/watch?v=' + v.id.videoId;
+      }
+      return;
+    }
+
+    // 3. Fallback: show most recent completed stream
+    res = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${CHANNEL_ID}&eventType=completed&type=video&order=date&maxResults=1&key=${YT_KEY}`);
+    data = await res.json();
+    if (data.items && data.items.length > 0) {
+      const v = data.items[0];
+      const date = new Date(v.snippet.publishedAt);
+      const dateStr = date.toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
+      label.textContent = 'Last Stream';
+      meta.innerHTML = v.snippet.title.replace(/^\[LIVE\]\s*/i, '') + '<br>' + dateStr;
+      tile.href = 'https://www.youtube.com/watch?v=' + v.id.videoId;
+    } else {
+      label.textContent = 'Live';
+      meta.innerHTML = 'No streams found';
+    }
+  } catch (e) {
+    label.textContent = 'Live';
+    meta.innerHTML = 'Unable to load';
+  }
+}
+
+function formatCountdown(target) {
+  const now = new Date();
+  const diff = target - now;
+  if (diff <= 0) return 'Starting soon…';
+  const days = Math.floor(diff / 86400000);
+  const hrs = Math.floor((diff % 86400000) / 3600000);
+  const mins = Math.floor((diff % 3600000) / 60000);
+  const secs = Math.floor((diff % 60000) / 1000);
+  if (days > 0) return days + 'd ' + hrs + 'h ' + mins + 'm';
+  if (hrs > 0) return hrs + 'h ' + mins + 'm ' + secs + 's';
+  return mins + 'm ' + secs + 's';
+}
+
+fetchLiveStatus();
+
+// Podcast Integration
+const PODCAST_PLAYLIST = 'PLz_9CwS6R7iKlVFCR313CWKxxsrElfr18';
+
+async function fetchPodcast() {
+  const label = document.getElementById('podcast-label');
+  const meta = document.getElementById('podcast-meta');
+  const tile = document.getElementById('podcast-tile');
+
+  try {
+    const res = await fetch(`https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=${PODCAST_PLAYLIST}&maxResults=1&key=${YT_KEY}`);
+    const data = await res.json();
+    if (data.items && data.items.length > 0) {
+      const ep = data.items[0].snippet;
+      const videoId = ep.resourceId.videoId;
+      // Extract episode number from title (e.g. "Ep#77")
+      const epMatch = ep.title.match(/Ep#?(\d+)/i);
+      const epNum = epMatch ? 'Episode #' + epMatch[1] : 'Latest Episode';
+      // Extract guest name — text after the dash before "Ep#"
+      const guestMatch = ep.title.match(/[|–—-]\s*(.+?)\s*[-–—|]\s*Ep/i);
+      const guest = guestMatch ? guestMatch[1].trim() : ep.title.split('-')[0].trim();
+
+      label.textContent = 'Podcast';
+      meta.innerHTML = epNum + '<br>' + guest;
+      tile.href = 'https://www.youtube.com/watch?v=' + videoId;
+    } else {
+      meta.innerHTML = 'No episodes found';
+    }
+  } catch (e) {
+    meta.innerHTML = 'Unable to load';
+  }
+}
+
+fetchPodcast();
+
+// Latest Video Integration (tile + section)
+async function fetchLatestVideo() {
+  const ytLabel = document.getElementById('yt-label');
+  const ytMeta = document.getElementById('yt-meta');
+  const ytTile = document.getElementById('yt-tile');
+  const card = document.getElementById('latest-video-card');
+  const thumb = document.getElementById('latest-video-thumb');
+  const name = document.getElementById('latest-video-name');
+  const date = document.getElementById('latest-video-date');
+
+  try {
+    // Get uploads playlist ID
+    const chRes = await fetch(`https://www.googleapis.com/youtube/v3/channels?part=contentDetails&id=${CHANNEL_ID}&key=${YT_KEY}`);
+    const chData = await chRes.json();
+    const uploadsId = chData.items[0].contentDetails.relatedPlaylists.uploads;
+
+    // Get latest video
+    const res = await fetch(`https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=${uploadsId}&maxResults=1&key=${YT_KEY}`);
+    const data = await res.json();
+
+    if (data.items && data.items.length > 0) {
+      const vid = data.items[0].snippet;
+      const videoId = vid.resourceId.videoId;
+      const videoUrl = 'https://www.youtube.com/watch?v=' + videoId;
+      const pubDate = new Date(vid.publishedAt);
+      const dateStr = pubDate.toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
+      const thumbUrl = (vid.thumbnails.maxres || vid.thumbnails.high || vid.thumbnails.medium).url;
+
+      // Update tile
+      ytLabel.textContent = 'YouTube';
+      ytMeta.innerHTML = 'Latest video<br>' + vid.title.substring(0, 40) + (vid.title.length > 40 ? '…' : '');
+      ytTile.href = videoUrl;
+
+      // Update section
+      thumb.style.backgroundImage = 'url(' + thumbUrl + ')';
+      name.textContent = vid.title;
+      date.textContent = dateStr;
+      card.onclick = () => window.open(videoUrl, '_blank');
+    }
+  } catch (e) {
+    ytMeta.innerHTML = 'Unable to load';
+    name.textContent = 'Unable to load';
+  }
+}
+
+fetchLatestVideo();
+
+// Events / Upcoming Streams
+async function fetchEvents() {
+  const list = document.getElementById('events-list');
+
+  try {
+    // Check for upcoming scheduled streams
+    const res = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${CHANNEL_ID}&eventType=upcoming&type=video&maxResults=10&order=date&key=${YT_KEY}`);
+    const data = await res.json();
+
+    // Also check for currently live
+    const liveRes = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${CHANNEL_ID}&eventType=live&type=video&maxResults=5&key=${YT_KEY}`);
+    const liveData = await liveRes.json();
+
+    const events = [];
+
+    // Add live streams first
+    if (liveData.items && liveData.items.length > 0) {
+      for (const item of liveData.items) {
+        events.push({ ...item, isLive: true });
+      }
+    }
+
+    // Add upcoming streams
+    if (data.items && data.items.length > 0) {
+      // Get scheduled start times
+      const ids = data.items.map(i => i.id.videoId).join(',');
+      const detailRes = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=liveStreamingDetails&id=${ids}&key=${YT_KEY}`);
+      const detailData = await detailRes.json();
+      const timeMap = {};
+      for (const d of detailData.items) {
+        timeMap[d.id] = d.liveStreamingDetails?.scheduledStartTime;
+      }
+      for (const item of data.items) {
+        item.scheduledStart = timeMap[item.id.videoId];
+        events.push(item);
+      }
+    }
+
+    if (events.length === 0) {
+      // Show recent past streams as reference
+      const pastRes = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${CHANNEL_ID}&eventType=completed&type=video&order=date&maxResults=5&key=${YT_KEY}`);
+      const pastData = await pastRes.json();
+      if (pastData.items && pastData.items.length > 0) {
+        list.innerHTML = '';
+        for (const item of pastData.items) {
+          const date = new Date(item.snippet.publishedAt);
+          const title = item.snippet.title.replace(/^\[LIVE\]\s*/i, '');
+          const url = 'https://www.youtube.com/watch?v=' + item.id.videoId;
+          list.innerHTML += buildEventRow(date, title, url, false, true);
+        }
+        // Update header to say "Recent Streams" since no upcoming
+        document.querySelector('.events-title').textContent = 'Recent Streams';
+      } else {
+        list.innerHTML = '<div class="event-empty">No upcoming streams scheduled</div>';
+      }
+      return;
+    }
+
+    list.innerHTML = '';
+    for (const ev of events) {
+      const date = ev.scheduledStart ? new Date(ev.scheduledStart) : new Date(ev.snippet.publishedAt);
+      const title = ev.snippet.title.replace(/^\[LIVE\]\s*/i, '');
+      const url = 'https://www.youtube.com/watch?v=' + ev.id.videoId;
+      list.innerHTML += buildEventRow(date, title, url, ev.isLive, false);
+    }
+
+  } catch (e) {
+    list.innerHTML = '<div class="event-empty">Unable to load events</div>';
+  }
+}
+
+function buildEventRow(date, title, url, isLive, isPast) {
+  const day = date.getDate();
+  const month = date.toLocaleDateString('en-GB', { month: 'short' });
+  const time = date.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+  const liveBadge = isLive ? '<span class="event-live-badge">Live Now</span>' : '';
+  const timeLabel = isPast ? 'Completed' : time;
+  return `<a class="event-row" href="${url}" target="_blank">
+    <div class="event-date-box"><span class="event-day">${day}</span><span class="event-month">${month}</span></div>
+    <div class="event-info"><span class="event-name">${title}</span><span class="event-time">${timeLabel}</span></div>
+    ${liveBadge}
+    <span class="event-arrow">↗</span>
+  </a>`;
+}
+
+fetchEvents();
+</script>
+
+</body>
+</html>
