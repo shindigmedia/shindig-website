@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Team — The Shin Dig</title>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=Barlow+Condensed:wght@400;600;700&family=Barlow:wght@400;500&family=Caveat:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:#0a0a0a;color:#f0f0f0;font-family:'Barlow',sans-serif;overflow-x:hidden;width:100%;}
+
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 32px;height:52px;
+  background:rgba(10,10,10,0.97);border-bottom:1px solid rgba(255,255,255,0.07);
+}
+.nav-logo{height:32px;width:auto;}
+.nav-links{display:flex;gap:28px;list-style:none;}
+.nav-links a{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.5);text-decoration:none;transition:color 0.15s;}
+.nav-links a:hover,.nav-links a.active{color:#fff;}
+
+.page-header{padding:100px 32px 48px;max-width:1200px;margin:0 auto;}
+.page-title{font-family:'Oswald',sans-serif;font-size:42px;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;color:#fff;margin-bottom:8px;}
+.page-subtitle{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:#e63226;}
+
+/* TEAM GRID */
+.team-section{padding:0 32px 80px;max-width:1200px;margin:0 auto;}
+.team-grid{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:48px 32px;
+  justify-items:center;
+}
+
+/* FLIP WRAPPER — holds the tilt and perspective */
+.card-wrap{
+  width:100%;
+  max-width:280px;
+  perspective:1000px;
+  cursor:pointer;
+}
+.card-wrap:nth-child(1){--tilt:-2.1deg;}
+.card-wrap:nth-child(2){--tilt:1.4deg;}
+.card-wrap:nth-child(3){--tilt:-0.8deg;}
+.card-wrap:nth-child(4){--tilt:2.2deg;}
+.card-wrap:nth-child(5){--tilt:1.1deg;}
+.card-wrap:nth-child(6){--tilt:-1.8deg;}
+.card-wrap:nth-child(7){--tilt:0.6deg;}
+.card-wrap:nth-child(8){--tilt:-2.5deg;}
+
+/* INNER — does the 3D spin */
+.card-inner{
+  position:relative;
+  width:100%;
+  transform-style:preserve-3d;
+  transform:rotate(var(--tilt, 0deg));
+  transition:transform 0.65s cubic-bezier(0.22,1,0.36,1), box-shadow 0.3s;
+  box-shadow:
+    0 4px 6px rgba(0,0,0,0.4),
+    0 12px 32px rgba(0,0,0,0.5),
+    0 2px 4px rgba(0,0,0,0.3);
+}
+.card-wrap:hover .card-inner{
+  transform:rotate(0deg) scale(1.04) translateY(-6px);
+  box-shadow:
+    0 8px 12px rgba(0,0,0,0.5),
+    0 24px 48px rgba(0,0,0,0.6),
+    0 4px 8px rgba(0,0,0,0.4);
+}
+.card-wrap.flipped .card-inner{
+  transform:rotate(0deg) rotateY(180deg) scale(1.04) translateY(-6px);
+  box-shadow:
+    0 8px 12px rgba(0,0,0,0.5),
+    0 24px 48px rgba(0,0,0,0.6),
+    0 4px 8px rgba(0,0,0,0.4);
+}
+
+/* FRONT & BACK FACES */
+.card-front,
+.card-back{
+  background:#f5f0e8;
+  padding:10px 10px 48px;
+  backface-visibility:hidden;
+  -webkit-backface-visibility:hidden;
+  position:relative;
+}
+.card-front{display:block;}
+.card-back{
+  position:absolute;
+  inset:0;
+  transform:rotateY(180deg);
+  padding:20px 18px 18px;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  background:#f5f0e8;
+  /* Faint lined paper effect */
+  background-image:repeating-linear-gradient(
+    transparent,
+    transparent 27px,
+    rgba(0,0,0,0.07) 27px,
+    rgba(0,0,0,0.07) 28px
+  );
+  background-position:0 36px;
+}
+
+/* Tape on front face */
+.card-front::before{
+  content:'';
+  display:block;
+  position:absolute;
+  top:-10px;
+  left:50%;
+  transform:translateX(-50%);
+  width:48px;
+  height:20px;
+  background:rgba(255,240,180,0.55);
+  border-radius:2px;
+  box-shadow:0 1px 3px rgba(0,0,0,0.15);
+  z-index:1;
+}
+.card-wrap:nth-child(even) .card-front::before{display:none;}
+
+/* FRONT IMAGE */
+.polaroid-img{
+  width:100%;
+  aspect-ratio:3/4;
+  object-fit:cover;
+  object-position:center top;
+  display:block;
+  background:#ddd;
+}
+.polaroid-placeholder{
+  width:100%;
+  aspect-ratio:3/4;
+  background:#ccc;
+  background-image:repeating-linear-gradient(
+    -45deg,
+    rgba(0,0,0,0.04) 0px,
+    rgba(0,0,0,0.04) 1px,
+    transparent 1px,
+    transparent 10px
+  );
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.polaroid-placeholder-text{
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:10px;font-weight:600;
+  letter-spacing:0.14em;text-transform:uppercase;
+  color:rgba(0,0,0,0.2);text-align:center;padding:0 12px;
+}
+.polaroid-caption{
+  position:absolute;
+  bottom:0;left:0;right:0;height:48px;
+  display:flex;align-items:center;justify-content:center;
+}
+.polaroid-name{
+  font-family:'Oswald',sans-serif;
+  font-size:15px;font-weight:700;
+  text-transform:uppercase;letter-spacing:0.06em;
+  color:#1a1a1a;text-align:center;
+}
+.polaroid-name.empty{
+  font-size:12px;font-weight:400;
+  color:rgba(0,0,0,0.2);
+  font-family:'Barlow Condensed',sans-serif;letter-spacing:0.08em;
+}
+
+/* BACK CONTENT — handwritten style */
+.back-name{
+  font-family:'Caveat',cursive;
+  font-size:28px;
+  font-weight:700;
+  color:#1a1a1a;
+  line-height:1.1;
+  margin-bottom:4px;
+}
+.back-role{
+  font-family:'Caveat',cursive;
+  font-size:16px;
+  font-weight:600;
+  color:#e63226;
+  margin-bottom:12px;
+}
+.back-details{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+.back-line{
+  font-family:'Caveat',cursive;
+  font-size:17px;
+  font-weight:400;
+  color:#2a2a2a;
+  display:flex;
+  align-items:baseline;
+  gap:6px;
+}
+.back-label{
+  font-family:'Caveat',cursive;
+  font-size:13px;
+  color:rgba(0,0,0,0.35);
+  min-width:52px;
+}
+.back-footer{
+  border-top:1px solid rgba(0,0,0,0.1);
+  padding-top:10px;
+  margin-top:8px;
+}
+.back-instagram{
+  font-family:'Caveat',cursive;
+  font-size:15px;
+  color:rgba(0,0,0,0.5);
+  font-weight:600;
+  text-decoration:none;
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+.back-instagram:hover{color:#e63226;}
+.back-instagram .ig-tag{
+  font-size:19px;
+  font-weight:600;
+  color:rgba(0,0,0,0.3);
+  font-style:italic;
+  text-decoration:underline;
+  text-underline-offset:3px;
+}
+.back-instagram:hover .ig-tag{color:#e63226;}
+.back-hint{
+  position:absolute;
+  bottom:8px;
+  right:12px;
+  font-family:'Caveat',cursive;
+  font-size:12px;
+  color:rgba(0,0,0,0.2);
+  font-style:italic;
+}
+
+/* FOOTER */
+.site-footer{padding:40px 32px 48px;border-top:1px solid rgba(255,255,255,0.07);text-align:center;}
+.footer-socials{display:flex;justify-content:center;gap:24px;margin-bottom:16px;}
+.footer-socials a{display:block;width:22px;height:22px;color:rgba(255,255,255,0.3);transition:color 0.2s;}
+.footer-socials a:hover{color:#e63226;}
+.footer-socials svg{width:22px;height:22px;}
+.footer-copy{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.15);}
+
+@media(max-width:1024px){
+  .team-grid{grid-template-columns:repeat(3,minmax(0,1fr));}
+}
+@media(max-width:700px){
+  nav{padding:0 16px;height:48px;}
+  .nav-logo{height:26px;}
+  .nav-links{gap:16px;}
+  .nav-links a{font-size:11px;letter-spacing:0.08em;}
+  .page-header{padding:80px 16px 32px;}
+  .page-title{font-size:32px;}
+  .team-section{padding:0 16px 60px;}
+  .team-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:32px 16px;}
+  .card-front{padding:8px 8px 40px;}
+  .polaroid-caption{height:40px;}
+  .polaroid-name{font-size:13px;}
+  .back-name{font-size:22px;}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html"><img class="nav-logo" src="logo-square.png" alt="The Shin Dig"></a>
+  <ul class="nav-links">
+    <li><a href="about.html">About</a></li>
+    <li><a href="team.html" class="active">Team</a></li>
+    <li><a href="https://shindigmedia.com/collections/all" target="_blank">Shop</a></li>
+    <li><a href="events.html">Events</a></li>
+    <li><a href="faq.html">FAQ</a></li>
+  </ul>
+</nav>
+
+<div class="page-header">
+  <h1 class="page-title">The Team</h1>
+  <p class="page-subtitle">The people behind The Shin Dig</p>
+</div>
+
+<div class="team-section">
+  <div class="team-grid">
+
+    <!-- Steve Rogers -->
+    <div class="card-wrap" onclick="this.classList.toggle('flipped')">
+      <div class="card-inner">
+        <div class="card-front">
+          <img class="polaroid-img" src="riders/steve-rogers.png" alt="Steve Rogers">
+          <div class="polaroid-caption"><span class="polaroid-name">Captain Crash</span></div>
+        </div>
+        <div class="card-back">
+          <div>
+            <div class="back-name">Steven Rogers</div>
+            <div class="back-role">Elite Team Rider</div>
+          </div>
+          <div class="back-details">
+            <div class="back-line"><span class="back-label">Wheel</span> 26"</div>
+            <div class="back-line"><span class="back-label">From</span> 🇬🇧 Great Britain</div>
+            <div class="back-line"><span class="back-label">aka</span> Captain Crash</div>
+          </div>
+          <div class="back-footer">
+            <a class="back-instagram" href="https://instagram.com/steven.j.rogers" target="_blank" onclick="event.stopPropagation()">@steven.j.rogers <span class="ig-tag">← click here</span></a>
+          </div>
+          <span class="back-hint">tap to flip back</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Vera Baron -->
+    <div class="card-wrap" onclick="this.classList.toggle('flipped')">
+      <div class="card-inner">
+        <div class="card-front">
+          <img class="polaroid-img" src="riders/vera-baron.png" alt="Vera Baron">
+          <div class="polaroid-caption"><span class="polaroid-name">Vera Baron</span></div>
+        </div>
+        <div class="card-back">
+          <div>
+            <div class="back-name">Vera Baron</div>
+            <div class="back-role">Elite Team Rider</div>
+          </div>
+          <div class="back-details">
+            <div class="back-line"><span class="back-label">No.</span> #20</div>
+            <div class="back-line"><span class="back-label">From</span> 🇪🇸 Spain</div>
+          </div>
+          <div class="back-footer">
+            <a class="back-instagram" href="https://instagram.com/veratrial" target="_blank" onclick="event.stopPropagation()">@veratrial <span class="ig-tag">← click here</span></a>
+          </div>
+          <span class="back-hint">tap to flip back</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Andrei Burton -->
+    <div class="card-wrap" onclick="this.classList.toggle('flipped')">
+      <div class="card-inner">
+        <div class="card-front">
+          <img class="polaroid-img" src="riders/andrei-burton.png" alt="Andrei Burton">
+          <div class="polaroid-caption"><span class="polaroid-name">Andrei Burton</span></div>
+        </div>
+        <div class="card-back">
+          <div>
+            <div class="back-name">Andrei Burton</div>
+            <div class="back-role">Stunt Director</div>
+          </div>
+          <div class="back-details">
+            <div class="back-line"><span class="back-label">Wheel</span> 26"</div>
+            <div class="back-line"><span class="back-label">From</span> 🇬🇧 Great Britain</div>
+          </div>
+          <div class="back-footer">
+            <a class="back-instagram" href="https://instagram.com/andreiburton" target="_blank" onclick="event.stopPropagation()">@andreiburton <span class="ig-tag">← click here</span></a>
+          </div>
+          <span class="back-hint">tap to flip back</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card-wrap" onclick="this.classList.toggle('flipped')">
+      <div class="card-inner">
+        <div class="card-front">
+          <div class="polaroid-placeholder"><span class="polaroid-placeholder-text">Coming Soon</span></div>
+          <div class="polaroid-caption"><span class="polaroid-name empty">Team Member</span></div>
+        </div>
+        <div class="card-back">
+          <div><div class="back-name" style="color:rgba(0,0,0,0.2);">Coming Soon</div></div>
+          <span class="back-hint">tap to flip back</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Callum Sherwood -->
+    <div class="card-wrap" onclick="this.classList.toggle('flipped')">
+      <div class="card-inner">
+        <div class="card-front">
+          <img class="polaroid-img" src="riders/callum-sherwood.png" alt="Callum Sherwood">
+          <div class="polaroid-caption"><span class="polaroid-name">Callum Sherwood</span></div>
+        </div>
+        <div class="card-back">
+          <div>
+            <div class="back-name">Callum Sherwood</div>
+            <div class="back-role">Elite Team Rider</div>
+          </div>
+          <div class="back-details">
+            <div class="back-line"><span class="back-label">Wheel</span> 20"</div>
+            <div class="back-line"><span class="back-label">From</span> 🇬🇧 Great Britain</div>
+          </div>
+          <div class="back-footer">
+            <a class="back-instagram" href="https://instagram.com/callum_sherwood1" target="_blank" onclick="event.stopPropagation()">@callum_sherwood1 <span class="ig-tag">← click here</span></a>
+          </div>
+          <span class="back-hint">tap to flip back</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- James Nurshaw -->
+    <div class="card-wrap" onclick="this.classList.toggle('flipped')">
+      <div class="card-inner">
+        <div class="card-front">
+          <img class="polaroid-img" src="riders/james-nurshaw.png" alt="James Nurshaw">
+          <div class="polaroid-caption"><span class="polaroid-name">James Nurshaw</span></div>
+        </div>
+        <div class="card-back">
+          <div>
+            <div class="back-name">James Nurshaw</div>
+            <div class="back-role">Elite Team Rider</div>
+          </div>
+          <div class="back-details">
+            <div class="back-line"><span class="back-label">Wheel</span> 20"</div>
+            <div class="back-line"><span class="back-label">From</span> 🇬🇧 Great Britain</div>
+          </div>
+          <div class="back-footer">
+            <a class="back-instagram" href="https://instagram.com/jamesnursaw_trials" target="_blank" onclick="event.stopPropagation()">@jamesnursaw_trials <span class="ig-tag">← click here</span></a>
+          </div>
+          <span class="back-hint">tap to flip back</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dr. Jess Martin -->
+    <div class="card-wrap" onclick="this.classList.toggle('flipped')">
+      <div class="card-inner">
+        <div class="card-front">
+          <img class="polaroid-img" src="riders/jess-martin.png" alt="Dr. Jess Martin">
+          <div class="polaroid-caption"><span class="polaroid-name">Dr. Jess Martin</span></div>
+        </div>
+        <div class="card-back">
+          <div>
+            <div class="back-name">Dr. Jess Martin</div>
+            <div class="back-role">Performance & Talent Agent</div>
+          </div>
+          <div class="back-details">
+            <div class="back-line"><span class="back-label">From</span> 🇺🇸 USA</div>
+          </div>
+          <div class="back-footer">
+            <a class="back-instagram" href="https://instagram.com/trialstrainerjess" target="_blank" onclick="event.stopPropagation()">@trialstrainerjess <span class="ig-tag">← click here</span></a>
+          </div>
+          <span class="back-hint">tap to flip back</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card-wrap" onclick="this.classList.toggle('flipped')">
+      <div class="card-inner">
+        <div class="card-front">
+          <div class="polaroid-placeholder"><span class="polaroid-placeholder-text">Coming Soon</span></div>
+          <div class="polaroid-caption"><span class="polaroid-name empty">Team Member</span></div>
+        </div>
+        <div class="card-back">
+          <div><div class="back-name" style="color:rgba(0,0,0,0.2);">Coming Soon</div></div>
+          <span class="back-hint">tap to flip back</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="footer-socials">
+    <a href="https://www.youtube.com/@theshindig" target="_blank" aria-label="YouTube">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+    </a>
+    <a href="https://www.instagram.com/shindigmedia" target="_blank" aria-label="Instagram">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+    </a>
+    <a href="https://www.facebook.com/theshindigmedia" target="_blank" aria-label="Facebook">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+    </a>
+    <a href="https://www.tiktok.com/@shindigmedia" target="_blank" aria-label="TikTok">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/></svg>
+    </a>
+  </div>
+  <p class="footer-copy">&copy; 2026 Shin Dig Media Ltd. All rights reserved.</p>
+</footer>
+
+</body>
+</html>

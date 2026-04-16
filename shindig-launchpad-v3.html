@@ -246,7 +246,9 @@ nav.scrolled{background:rgba(10,10,10,0.97);border-bottom:1px solid rgba(255,255
   <a href="shindig-launchpad-v3.html"><img class="nav-logo" src="logo-square.png" alt="The Shin Dig"></a>
   <ul class="nav-links">
     <li><a href="about.html">About</a></li>
+    <li><a href="team.html">Team</a></li>
     <li><a href="https://shindigmedia.com/collections/all" target="_blank">Shop</a></li>
+    <li><a href="events.html">Events</a></li>
     <li><a href="faq.html">FAQ</a></li>
   </ul>
 </nav>
@@ -545,7 +547,7 @@ async function fetchPodcast() {
 
 fetchPodcast();
 
-// Latest Video Integration (tile + section)
+// Latest Video — via RSS (no API quota cost)
 async function fetchLatestVideo() {
   const ytLabel = document.getElementById('yt-label');
   const ytMeta = document.getElementById('yt-meta');
@@ -556,22 +558,17 @@ async function fetchLatestVideo() {
   const date = document.getElementById('latest-video-date');
 
   try {
-    // Get uploads playlist ID
-    const chRes = await fetch(`https://www.googleapis.com/youtube/v3/channels?part=contentDetails&id=${CHANNEL_ID}&key=${YT_KEY}`);
-    const chData = await chRes.json();
-    const uploadsId = chData.items[0].contentDetails.relatedPlaylists.uploads;
-
-    // Get latest video
-    const res = await fetch(`https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=${uploadsId}&maxResults=1&key=${YT_KEY}`);
+    const rssUrl = `https://www.youtube.com/feeds/videos.xml?channel_id=${CHANNEL_ID}`;
+    const res = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}`);
     const data = await res.json();
 
-    if (data.items && data.items.length > 0) {
-      const vid = data.items[0].snippet;
-      const videoId = vid.resourceId.videoId;
-      const videoUrl = 'https://www.youtube.com/watch?v=' + videoId;
-      const pubDate = new Date(vid.publishedAt);
+    if (data.status === 'ok' && data.items && data.items.length > 0) {
+      const vid = data.items[0];
+      const videoUrl = vid.link;
+      const videoId = new URL(videoUrl).searchParams.get('v');
+      const pubDate = new Date(vid.pubDate);
       const dateStr = pubDate.toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
-      const thumbUrl = (vid.thumbnails.maxres || vid.thumbnails.high || vid.thumbnails.medium).url;
+      const thumbUrl = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
 
       // Update tile
       ytLabel.textContent = 'YouTube';
