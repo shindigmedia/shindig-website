@@ -209,8 +209,10 @@ nav.scrolled{background:rgba(10,10,10,0.97);border-bottom:1px solid rgba(255,255
   .nav-links a{font-size:11px;letter-spacing:0.08em;}
 
   /* Tiles */
-  .tiles{grid-template-columns:1fr;grid-auto-rows:180px;padding-top:48px;}
-  .tile{padding:22px 20px 20px;border-right:none;border-bottom:1px solid rgba(255,255,255,0.08);}
+  .tiles{grid-template-columns:1fr;grid-auto-rows:160px;padding-top:48px;}
+  .tile{padding:22px 20px 20px;border-right:none;border-bottom:1px solid rgba(255,255,255,0.06);background:rgba(0,0,0,0.04);}
+  .tile:hover{background:rgba(0,0,0,0.15);}
+  .tile::after{height:55%;background:linear-gradient(to top,rgba(0,0,0,0.35) 0%,transparent 100%);}
   .tile:last-child{border-bottom:none;}
   .tile-label{font-size:20px;}
 
