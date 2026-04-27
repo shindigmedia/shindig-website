@@ -22,27 +22,11 @@ nav.scrolled{background:rgba(10,10,10,0.97);border-bottom:1px solid rgba(255,255
 .nav-links a{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.5);text-decoration:none;transition:color 0.15s;}
 .nav-links a:hover{color:#fff;}
 
-/* HERO */
-.hero{position:relative;height:100vh;min-height:600px;max-height:900px;overflow:hidden;}
-.hero-slides{position:absolute;inset:0;}
-.slide{position:absolute;inset:0;opacity:0;transition:opacity 1.2s cubic-bezier(0.4,0,0.2,1);}
-.slide.active{opacity:1;}
-.slide img{width:100%;height:100%;object-fit:cover;object-position:center 35%;display:block;filter:brightness(0.6) contrast(1.08) saturate(0.85);transform:scale(1.04);transition:transform 8s cubic-bezier(0.1,0,0.1,1);}
-.slide.active img{transform:scale(1);}
-.hero-grad-bottom{position:absolute;inset:0;z-index:2;background:linear-gradient(to top,rgba(10,10,10,1) 0%,rgba(10,10,10,0.65) 22%,rgba(10,10,10,0.1) 55%,transparent 100%);pointer-events:none;}
-.hero-grad-sides{position:absolute;inset:0;z-index:2;background:linear-gradient(to right,rgba(10,10,10,0.55) 0%,transparent 45%,transparent 55%,rgba(10,10,10,0.3) 100%);pointer-events:none;}
-.hero-grain{position:absolute;inset:0;z-index:3;opacity:0.04;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");pointer-events:none;}
-.hero-content{position:absolute;bottom:0;left:0;right:0;z-index:4;padding:0 36px 44px;}
-.hero-logo{width:min(640px,78vw);height:auto;display:block;filter:drop-shadow(0 2px 24px rgba(0,0,0,0.9)) drop-shadow(0 0 60px rgba(230,50,38,0.1));margin-bottom:10px;}
-.hero-tagline{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:0.22em;text-transform:uppercase;color:rgba(255,255,255,0.3);}
-.hero-dots{position:absolute;bottom:20px;right:32px;z-index:5;display:flex;gap:6px;align-items:center;}
-.dot{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,0.25);cursor:pointer;transition:background 0.2s,transform 0.2s;}
-.dot.active{background:#e63226;transform:scale(1.3);}
-
 .tiles{
+  padding-top:64px;
   display:grid;
   grid-template-columns:repeat(4,minmax(0,1fr));
-  grid-auto-rows:220px;
+  grid-auto-rows:clamp(220px,35vh,320px);
   gap:2px;
 }
 .tile{
@@ -117,7 +101,7 @@ nav.scrolled{background:rgba(10,10,10,0.97);border-bottom:1px solid rgba(255,255
 .product{cursor:pointer;background:#0f0f0f;}
 .product:hover .pimg-inner{transform:scale(1.03);}
 .product:hover .product-name{color:#e63226;}
-.pimg{aspect-ratio:3/4;overflow:hidden;background:#141414;position:relative;}
+.pimg{aspect-ratio:1/1;overflow:hidden;background:#141414;position:relative;}
 .pimg-inner{width:100%;height:100%;min-height:0;background:#161616;background-image:repeating-linear-gradient(-45deg,rgba(255,255,255,0.015) 0px,rgba(255,255,255,0.015) 1px,transparent 1px,transparent 10px);transition:transform 0.4s cubic-bezier(0.22,1,0.36,1);display:flex;align-items:center;justify-content:center;}
 .pimg-ph{font-family:'Barlow Condensed',sans-serif;font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:rgba(255,255,255,0.07);}
 .product-new{position:absolute;top:10px;left:10px;font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;background:#e63226;color:#fff;padding:3px 7px;}
@@ -150,7 +134,7 @@ nav.scrolled{background:rgba(10,10,10,0.97);border-bottom:1px solid rgba(255,255
 .latest-video-header{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:24px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,0.07);}
 .latest-video-title{font-family:'Oswald',sans-serif;font-size:13px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:#fff;display:flex;align-items:center;gap:10px;}
 .latest-video-title::before{content:'';display:block;width:3px;height:13px;background:#e63226;}
-.latest-video-card{cursor:pointer;background:#111;overflow:hidden;transition:background 0.25s;position:relative;}
+.latest-video-card{cursor:pointer;background:#111;overflow:hidden;transition:background 0.25s;position:relative;max-width:720px;}
 .latest-video-card:hover{background:#161616;}
 .latest-video-thumb{width:100%;aspect-ratio:16/9;background:#141414;background-size:cover;background-position:center;position:relative;overflow:hidden;}
 .latest-video-thumb::after{content:'▶';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:56px;height:56px;background:rgba(230,50,38,0.9);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;color:#fff;padding-left:3px;opacity:0;transition:opacity 0.25s;}
@@ -196,15 +180,8 @@ nav.scrolled{background:rgba(10,10,10,0.97);border-bottom:1px solid rgba(255,255
   .nav-links{gap:16px;}
   .nav-links a{font-size:11px;letter-spacing:0.08em;}
 
-  /* Hero */
-  .hero{min-height:400px;max-height:600px;}
-  .hero-content{padding:0 20px 28px;}
-  .hero-logo{width:min(400px,85vw);}
-  .hero-tagline{font-size:10px;}
-  .hero-dots{right:16px;bottom:14px;}
-
   /* Tiles */
-  .tiles{grid-template-columns:1fr;grid-auto-rows:180px;}
+  .tiles{grid-template-columns:1fr;grid-auto-rows:180px;padding-top:48px;}
   .tile{padding:22px 20px 20px;}
   .tile-label{font-size:20px;}
 
@@ -253,29 +230,6 @@ nav.scrolled{background:rgba(10,10,10,0.97);border-bottom:1px solid rgba(255,255
   </ul>
 </nav>
 
-<div class="hero">
-  <div class="hero-slides" id="slides">
-    <div class="slide active"><img src="img-hero1.jpg" alt=""></div>
-    <div class="slide"><img src="img-hero2.jpg" alt=""></div>
-    <div class="slide"><img src="img-hero3.jpg" alt=""></div>
-    <div class="slide"><img src="img-hero4.jpg" alt=""></div>
-    <div class="slide"><img src="img-hero5.jpg" alt=""></div>
-  </div>
-  <div class="hero-grad-bottom"></div>
-  <div class="hero-grad-sides"></div>
-  <div class="hero-grain"></div>
-  <div class="hero-content">
-    <img class="hero-logo" src="logo-long.png" alt="The Shin Dig">
-    <span class="hero-tagline">Home of Bike Trials</span>
-  </div>
-  <div class="hero-dots" id="dots">
-    <div class="dot active" onclick="goTo(0)"></div>
-    <div class="dot" onclick="goTo(1)"></div>
-    <div class="dot" onclick="goTo(2)"></div>
-    <div class="dot" onclick="goTo(3)"></div>
-    <div class="dot" onclick="goTo(4)"></div>
-  </div>
-</div>
 
 <div class="tiles">
 
@@ -411,24 +365,6 @@ nav.scrolled{background:rgba(10,10,10,0.97);border-bottom:1px solid rgba(255,255
 <script>
 const nav = document.getElementById('nav');
 window.addEventListener('scroll', () => nav.classList.toggle('scrolled', window.scrollY > 60));
-
-let current = 0;
-const slides = document.querySelectorAll('.slide');
-const dots = document.querySelectorAll('.dot');
-let timer;
-
-function goTo(n) {
-  slides[current].classList.remove('active');
-  dots[current].classList.remove('active');
-  current = n;
-  slides[current].classList.add('active');
-  dots[current].classList.add('active');
-  clearInterval(timer);
-  timer = setInterval(next, 5000);
-}
-
-function next() { goTo((current + 1) % slides.length); }
-timer = setInterval(next, 5000);
 
 // YouTube Live Stream Integration
 const YT_KEY = 'AIzaSyApQveLGZ_wU1Z2kAvdKXAF7n4oCo3y4Vs';
