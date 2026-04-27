@@ -22,7 +22,7 @@ nav{
 
 .page-wrap{max-width:1100px;margin:0 auto;padding:100px 32px 80px;}
 .page-title{font-family:'Oswald',sans-serif;font-size:42px;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;color:#fff;margin-bottom:8px;}
-.page-subtitle{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:#e63226;margin-bottom:48px;}
+.page-subtitle{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:#ff0000;margin-bottom:48px;}
 
 /* LAYOUT */
 .events-layout{display:grid;grid-template-columns:1fr 340px;gap:32px;align-items:start;}
@@ -43,7 +43,7 @@ nav{
   width:32px;height:32px;cursor:pointer;font-size:14px;
   transition:border-color 0.2s,color 0.2s;display:flex;align-items:center;justify-content:center;
 }
-.cal-btn:hover{border-color:#e63226;color:#e63226;}
+.cal-btn:hover{border-color:#ff0000;color:#ff0000;}
 
 .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;}
 .cal-day-label{
@@ -58,7 +58,7 @@ nav{
 .cal-day.other-month .cal-day-num{color:rgba(255,255,255,0.12);}
 .cal-day.has-event{cursor:pointer;}
 .cal-day.has-event:hover{background:#161616;}
-.cal-day.selected{background:#1a1a1a;outline:1px solid rgba(230,50,38,0.4);}
+.cal-day.selected{background:#1a1a1a;outline:1px solid rgba(255,0,0,0.4);}
 .cal-day.hovered{background:#1a1a1a;outline:1px solid rgba(255,255,255,0.15);}
 .cal-day-num{
   position:absolute;top:5px;left:0;right:0;text-align:center;
@@ -67,7 +67,7 @@ nav{
 }
 .cal-day.has-event .cal-day-num{color:#fff;}
 .cal-day.today .cal-day-num{
-  background:#e63226;color:#fff;border-radius:50%;
+  background:#ff0000;color:#fff;border-radius:50%;
   width:24px;height:24px;display:flex;align-items:center;justify-content:center;
   left:50%;right:auto;transform:translateX(-50%);top:4px;
 }
@@ -80,10 +80,10 @@ nav{
 .cal-tablet.middle{left:-2px;right:-2px;}
 .cal-tablet.end{left:-2px;right:10%;border-radius:0 3px 3px 0;}
 
-.cal-tablet.hosting{background:rgba(230,50,38,0.75);}
+.cal-tablet.hosting{background:rgba(255,0,0,0.75);}
 .cal-tablet.attending{background:rgba(74,158,255,0.65);}
 .cal-tablet.livestream{background:rgba(180,95,229,0.7);}
-.cal-dot.hosting{background:#e63226;}
+.cal-dot.hosting{background:#ff0000;}
 .cal-dot.attending{background:#4a9eff;}
 .cal-dot.livestream{background:#b45fe5;}
 
@@ -107,7 +107,7 @@ nav{
   display:flex;align-items:center;gap:10px;
   margin-bottom:14px;
 }
-.upcoming-header::before{content:'';display:block;width:3px;height:13px;background:#e63226;}
+.upcoming-header::before{content:'';display:block;width:3px;height:13px;background:#ff0000;}
 
 .event-card{
   background:#111;padding:16px 18px;
@@ -116,7 +116,7 @@ nav{
   text-decoration:none;color:inherit;display:block;
   cursor:pointer;
 }
-.event-card.hosting{border-left-color:#e63226;}
+.event-card.hosting{border-left-color:#ff0000;}
 .event-card.attending{border-left-color:#4a9eff;}
 .event-card.livestream{border-left-color:#b45fe5;}
 .event-card.selected-card{background:#161616;outline:1px solid rgba(255,255,255,0.08);}
@@ -131,7 +131,7 @@ nav{
   text-transform:uppercase;letter-spacing:0.04em;color:#fff;
   display:block;margin-bottom:3px;transition:color 0.2s;
 }
-.event-card:hover .ev-title{color:#e63226;}
+.event-card:hover .ev-title{color:#ff0000;}
 .ev-meta{
   font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;
   letter-spacing:0.07em;text-transform:uppercase;color:rgba(255,255,255,0.25);
@@ -140,7 +140,7 @@ nav{
 .ev-type{
   padding:2px 7px;font-size:10px;letter-spacing:0.1em;
 }
-.ev-type.hosting{background:rgba(230,50,38,0.15);color:#e63226;}
+.ev-type.hosting{background:rgba(255,0,0,0.15);color:#ff0000;}
 .ev-type.attending{background:rgba(74,158,255,0.15);color:#4a9eff;}
 .ev-type.livestream{background:rgba(180,95,229,0.15);color:#b45fe5;}
 
@@ -154,7 +154,7 @@ nav{
 .site-footer{padding:40px 32px 48px;border-top:1px solid rgba(255,255,255,0.07);text-align:center;}
 .footer-socials{display:flex;justify-content:center;gap:24px;margin-bottom:16px;}
 .footer-socials a{display:block;width:22px;height:22px;color:rgba(255,255,255,0.3);transition:color 0.2s;}
-.footer-socials a:hover{color:#e63226;}
+.footer-socials a:hover{color:#ff0000;}
 .footer-socials svg{width:22px;height:22px;}
 .footer-copy{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.15);}
 
@@ -201,7 +201,7 @@ nav{
         </div>
         <div class="cal-grid" id="cal-grid"></div>
         <div class="cal-legend">
-          <div class="legend-item"><div class="legend-dot" style="background:rgba(230,50,38,0.25)"></div><span class="legend-label">Hosting</span></div>
+          <div class="legend-item"><div class="legend-dot" style="background:rgba(255,0,0,0.25)"></div><span class="legend-label">Hosting</span></div>
           <div class="legend-item"><div class="legend-dot" style="background:rgba(74,158,255,0.2)"></div><span class="legend-label">Attending</span></div>
           <div class="legend-item"><div class="legend-dot" style="background:rgba(180,95,229,0.2)"></div><span class="legend-label">Live Stream</span></div>
         </div>
