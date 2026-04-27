@@ -617,64 +617,51 @@ async function fetchLatestVideo() {
 
 fetchLatestVideo();
 
-// Events / Upcoming Streams
+// Upcoming Events — Google Calendar (same source as events page)
+const GCAL_ID = '5cad6d407f3cf54943fec2817c1af011d21e3d0e5b6e89daeed885e194a03549@group.calendar.google.com';
+
 async function fetchEvents() {
   const list = document.getElementById('events-list');
-
-  const TTL = 10 * 60 * 1000; // 10 min
   try {
-    const [data, liveData] = await Promise.all([
-      ytFetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${CHANNEL_ID}&eventType=upcoming&type=video&maxResults=10&order=date&key=${YT_KEY}`, TTL),
-      ytFetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${CHANNEL_ID}&eventType=live&type=video&maxResults=5&key=${YT_KEY}`, TTL),
-    ]);
+    const cacheKey = 'gcal:upcoming';
+    let events = null;
+    try {
+      const cached = sessionStorage.getItem(cacheKey);
+      if (cached) { const { ts, data } = JSON.parse(cached); if (Date.now() - ts < 30*60*1000) events = data; }
+    } catch {}
 
-    if (data.error) { list.innerHTML = '<div class="event-empty">Check back soon</div>'; return; }
-
-    const events = [];
-    if (liveData.items?.length > 0) {
-      for (const item of liveData.items) events.push({ ...item, isLive: true });
-    }
-    if (data.items?.length > 0) {
-      const ids = data.items.map(i => i.id.videoId).join(',');
-      const detailData = await ytFetch(`https://www.googleapis.com/youtube/v3/videos?part=liveStreamingDetails&id=${ids}&key=${YT_KEY}`, TTL);
-      const timeMap = {};
-      for (const d of (detailData.items || [])) timeMap[d.id] = d.liveStreamingDetails?.scheduledStartTime;
-      for (const item of data.items) { item.scheduledStart = timeMap[item.id.videoId]; events.push(item); }
+    if (!events) {
+      const now = new Date().toISOString();
+      const end = new Date(Date.now() + 365*24*60*60*1000).toISOString();
+      const url = `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(GCAL_ID)}/events?key=${YT_KEY}&timeMin=${now}&timeMax=${end}&singleEvents=true&orderBy=startTime&maxResults=5`;
+      const res = await fetch(url);
+      const data = await res.json();
+      if (!data.items) { list.innerHTML = '<div class="event-empty">No upcoming events</div>'; return; }
+      events = data.items;
+      try { sessionStorage.setItem(cacheKey, JSON.stringify({ ts: Date.now(), data: events })); } catch {}
     }
 
-    if (events.length === 0) {
-      const pastData = await ytFetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${CHANNEL_ID}&eventType=completed&type=video&order=date&maxResults=5&key=${YT_KEY}`, 30 * 60 * 1000);
-      if (pastData.items?.length > 0) {
-        list.innerHTML = '';
-        for (const item of pastData.items) {
-          const date = new Date(item.snippet.publishedAt);
-          const title = item.snippet.title.replace(/^\[LIVE\]\s*/i, '');
-          list.innerHTML += buildEventRow(date, title, 'https://www.youtube.com/watch?v=' + item.id.videoId, false, true);
-        }
-        document.querySelector('.events-title').textContent = 'Recent Streams';
-      } else {
-        list.innerHTML = '<div class="event-empty">No upcoming streams scheduled</div>';
-      }
-      return;
-    }
+    if (events.length === 0) { list.innerHTML = '<div class="event-empty">No upcoming events scheduled</div>'; return; }
 
     list.innerHTML = '';
-    for (const ev of events) {
-      const date = ev.scheduledStart ? new Date(ev.scheduledStart) : new Date(ev.snippet.publishedAt);
-      const title = ev.snippet.title.replace(/^\[LIVE\]\s*/i, '');
-      list.innerHTML += buildEventRow(date, title, 'https://www.youtube.com/watch?v=' + ev.id.videoId, ev.isLive, false);
+    for (const item of events) {
+      const start = item.start?.dateTime || item.start?.date;
+      const date = new Date(start.length === 10 ? start + 'T00:00:00' : start);
+      const url = item.htmlLink || '#';
+      const allDay = !item.start?.dateTime;
+      list.innerHTML += buildEventRow(date, item.summary || 'Event', url, false, false, allDay);
     }
   } catch (e) {
-    list.innerHTML = '<div class="event-empty">Check back soon</div>';
+    list.innerHTML = '<div class="event-empty">No upcoming events</div>';
   }
 }
 
-function buildEventRow(date, title, url, isLive, isPast) {
+function buildEventRow(date, title, url, isLive, isPast, allDay) {
   const day = date.getDate();
   const month = date.toLocaleDateString('en-GB', { month: 'short' });
   const time = date.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
   const liveBadge = isLive ? '<span class="event-live-badge">Live Now</span>' : '';
-  const timeLabel = isPast ? 'Completed' : time;
+  const timeLabel = isPast ? 'Completed' : allDay ? 'All day' : time;
   return `<a class="event-row" href="${url}" target="_blank">
     <div class="event-date-box"><span class="event-day">${day}</span><span class="event-month">${month}</span></div>
     <div class="event-info"><span class="event-name">${title}</span><span class="event-time">${timeLabel}</span></div>
