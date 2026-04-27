@@ -656,7 +656,7 @@ function buildEventRow(date, title, url, isLive, isPast, allDay) {
   const month = date.toLocaleDateString('en-GB', { month: 'short' });
   const time = date.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
   const liveBadge = isLive ? '<span class="event-live-badge">Live Now</span>' : '';
-  const timeLabel = isPast ? 'Completed' : allDay ? 'All day' : time;
+  const timeLabel = isPast ? 'Completed' : allDay ? '' : time;
   return `<a class="event-row" href="${url}" target="_blank">
     <div class="event-date-box"><span class="event-day">${day}</span><span class="event-month">${month}</span></div>
     <div class="event-info"><span class="event-name">${title}</span><span class="event-time">${timeLabel}</span></div>
