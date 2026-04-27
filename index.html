@@ -113,8 +113,9 @@ nav.scrolled{background:rgba(10,10,10,0.97);border-bottom:1px solid rgba(255,255
 .tile-arrow{
   font-size:16px;color:rgba(255,255,255,0.5);text-shadow:0 1px 4px rgba(0,0,0,0.9);
   transition:transform 0.25s cubic-bezier(0.22,1,0.36,1),color 0.2s;
-  display:inline-block;
+  display:inline-block;font-family:'Barlow Condensed',sans-serif;
 }
+.tile-arrow::before{content:'↗\FE0E';}
 .tile:hover .tile-arrow{transform:translate(4px,-4px);color:#fff;}
 
 /* SHOP */
@@ -306,7 +307,7 @@ nav.scrolled{background:rgba(10,10,10,0.97);border-bottom:1px solid rgba(255,255
       <div class="tile-spacer"></div>
       <span class="tile-label">Shop</span>
       <span class="tile-meta">Spring 26 drop<br>Tees &amp; hoodies</span>
-      <span class="tile-arrow">↗</span>
+      <span class="tile-arrow"></span>
     </div>
   </a>
 
@@ -322,7 +323,7 @@ nav.scrolled{background:rgba(10,10,10,0.97);border-bottom:1px solid rgba(255,255
       <div class="tile-spacer"></div>
       <span class="tile-label" id="yt-label">YouTube</span>
       <span class="tile-meta" id="yt-meta">Loading…</span>
-      <span class="tile-arrow">↗</span>
+      <span class="tile-arrow"></span>
     </div>
   </a>
 
@@ -340,7 +341,7 @@ nav.scrolled{background:rgba(10,10,10,0.97);border-bottom:1px solid rgba(255,255
       <div class="tile-spacer"></div>
       <span class="tile-label" id="podcast-label">Podcast</span>
       <span class="tile-meta" id="podcast-meta">Loading…</span>
-      <span class="tile-arrow">↗</span>
+      <span class="tile-arrow"></span>
     </div>
   </a>
 
@@ -359,7 +360,7 @@ nav.scrolled{background:rgba(10,10,10,0.97);border-bottom:1px solid rgba(255,255
       <div class="tile-spacer"></div>
       <span class="tile-label" id="live-label">Live</span>
       <span class="tile-meta" id="live-meta">Loading…</span>
-      <span class="tile-arrow">↗</span>
+      <span class="tile-arrow"></span>
     </div>
   </a>
 
