@@ -452,19 +452,37 @@ function goTo(n) {
 function next() { goTo((current + 1) % slides.length); }
 timer = setInterval(next, 5000);
 
-// YouTube Live Stream Integration
+// YouTube API — cached fetch to protect daily quota
 const YT_KEY = 'AIzaSyApQveLGZ_wU1Z2kAvdKXAF7n4oCo3y4Vs';
 const CHANNEL_ID = 'UC1LCSELQgJQw7YBN5ywA8Vg';
+
+async function ytFetch(url, ttlMs) {
+  const key = 'ytc:' + url;
+  try {
+    const cached = sessionStorage.getItem(key);
+    if (cached) {
+      const { ts, data } = JSON.parse(cached);
+      if (Date.now() - ts < ttlMs) return data;
+    }
+  } catch {}
+  const res = await fetch(url);
+  const data = await res.json();
+  if (!data.error) {
+    try { sessionStorage.setItem(key, JSON.stringify({ ts: Date.now(), data })); } catch {}
+  }
+  return data;
+}
 
 async function fetchLiveStatus() {
   const label = document.getElementById('live-label');
   const meta = document.getElementById('live-meta');
   const tile = document.getElementById('live-tile');
+  const TTL = 5 * 60 * 1000; // 5 min
 
   try {
     // 1. Check if currently live
-    let res = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${CHANNEL_ID}&eventType=live&type=video&key=${YT_KEY}`);
-    let data = await res.json();
+    let data = await ytFetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${CHANNEL_ID}&eventType=live&type=video&key=${YT_KEY}`, TTL);
+    if (data.error) { meta.innerHTML = 'Check back soon'; return; }
     if (data.items && data.items.length > 0) {
       const v = data.items[0];
       label.textContent = 'Live Now';
@@ -475,24 +493,18 @@ async function fetchLiveStatus() {
     }
 
     // 2. Check for upcoming scheduled stream
-    res = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${CHANNEL_ID}&eventType=upcoming&type=video&key=${YT_KEY}`);
-    data = await res.json();
+    data = await ytFetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${CHANNEL_ID}&eventType=upcoming&type=video&key=${YT_KEY}`, TTL);
+    if (data.error) { meta.innerHTML = 'Check back soon'; return; }
     if (data.items && data.items.length > 0) {
       const v = data.items[0];
-      // Get scheduled start time
-      const detailRes = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=liveStreamingDetails&id=${v.id.videoId}&key=${YT_KEY}`);
-      const detailData = await detailRes.json();
-      const startTime = detailData.items[0]?.liveStreamingDetails?.scheduledStartTime;
-
+      const detailData = await ytFetch(`https://www.googleapis.com/youtube/v3/videos?part=liveStreamingDetails&id=${v.id.videoId}&key=${YT_KEY}`, TTL);
+      const startTime = detailData.items?.[0]?.liveStreamingDetails?.scheduledStartTime;
       label.textContent = 'Next Stream';
       if (startTime) {
         const start = new Date(startTime);
         meta.innerHTML = v.snippet.title + '<br>' + formatCountdown(start);
         tile.href = 'https://www.youtube.com/watch?v=' + v.id.videoId;
-        // Update countdown every second
-        setInterval(() => {
-          meta.innerHTML = v.snippet.title + '<br>' + formatCountdown(start);
-        }, 1000);
+        setInterval(() => { meta.innerHTML = v.snippet.title + '<br>' + formatCountdown(start); }, 1000);
       } else {
         meta.innerHTML = v.snippet.title;
         tile.href = 'https://www.youtube.com/watch?v=' + v.id.videoId;
@@ -500,23 +512,22 @@ async function fetchLiveStatus() {
       return;
     }
 
-    // 3. Fallback: show most recent completed stream
-    res = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${CHANNEL_ID}&eventType=completed&type=video&order=date&maxResults=1&key=${YT_KEY}`);
-    data = await res.json();
+    // 3. Fallback: most recent completed stream
+    data = await ytFetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${CHANNEL_ID}&eventType=completed&type=video&order=date&maxResults=1&key=${YT_KEY}`, 15 * 60 * 1000);
+    if (data.error) { meta.innerHTML = 'Check back soon'; return; }
     if (data.items && data.items.length > 0) {
       const v = data.items[0];
-      const date = new Date(v.snippet.publishedAt);
-      const dateStr = date.toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
+      const dateStr = new Date(v.snippet.publishedAt).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
       label.textContent = 'Last Stream';
       meta.innerHTML = v.snippet.title.replace(/^\[LIVE\]\s*/i, '') + '<br>' + dateStr;
       tile.href = 'https://www.youtube.com/watch?v=' + v.id.videoId;
     } else {
       label.textContent = 'Live';
-      meta.innerHTML = 'No streams found';
+      meta.innerHTML = 'No streams scheduled';
     }
   } catch (e) {
     label.textContent = 'Live';
-    meta.innerHTML = 'Unable to load';
+    meta.innerHTML = 'Check back soon';
   }
 }
 
@@ -544,18 +555,15 @@ async function fetchPodcast() {
   const tile = document.getElementById('podcast-tile');
 
   try {
-    const res = await fetch(`https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=${PODCAST_PLAYLIST}&maxResults=1&key=${YT_KEY}`);
-    const data = await res.json();
+    const data = await ytFetch(`https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=${PODCAST_PLAYLIST}&maxResults=1&key=${YT_KEY}`, 60 * 60 * 1000);
+    if (data.error) { meta.innerHTML = 'Check back soon'; return; }
     if (data.items && data.items.length > 0) {
       const ep = data.items[0].snippet;
       const videoId = ep.resourceId.videoId;
-      // Extract episode number from title (e.g. "Ep#77")
       const epMatch = ep.title.match(/Ep#?(\d+)/i);
       const epNum = epMatch ? 'Episode #' + epMatch[1] : 'Latest Episode';
-      // Extract guest name — text after the dash before "Ep#"
       const guestMatch = ep.title.match(/[|–—-]\s*(.+?)\s*[-–—|]\s*Ep/i);
       const guest = guestMatch ? guestMatch[1].trim() : ep.title.split('-')[0].trim();
-
       label.textContent = 'Podcast';
       meta.innerHTML = epNum + '<br>' + guest;
       tile.href = 'https://www.youtube.com/watch?v=' + videoId;
@@ -563,7 +571,7 @@ async function fetchPodcast() {
       meta.innerHTML = 'No episodes found';
     }
   } catch (e) {
-    meta.innerHTML = 'Unable to load';
+    meta.innerHTML = 'Check back soon';
   }
 }
 
@@ -615,53 +623,36 @@ fetchLatestVideo();
 async function fetchEvents() {
   const list = document.getElementById('events-list');
 
+  const TTL = 10 * 60 * 1000; // 10 min
   try {
-    // Check for upcoming scheduled streams
-    const res = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${CHANNEL_ID}&eventType=upcoming&type=video&maxResults=10&order=date&key=${YT_KEY}`);
-    const data = await res.json();
+    const [data, liveData] = await Promise.all([
+      ytFetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${CHANNEL_ID}&eventType=upcoming&type=video&maxResults=10&order=date&key=${YT_KEY}`, TTL),
+      ytFetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${CHANNEL_ID}&eventType=live&type=video&maxResults=5&key=${YT_KEY}`, TTL),
+    ]);
 
-    // Also check for currently live
-    const liveRes = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${CHANNEL_ID}&eventType=live&type=video&maxResults=5&key=${YT_KEY}`);
-    const liveData = await liveRes.json();
+    if (data.error) { list.innerHTML = '<div class="event-empty">Check back soon</div>'; return; }
 
     const events = [];
-
-    // Add live streams first
-    if (liveData.items && liveData.items.length > 0) {
-      for (const item of liveData.items) {
-        events.push({ ...item, isLive: true });
-      }
+    if (liveData.items?.length > 0) {
+      for (const item of liveData.items) events.push({ ...item, isLive: true });
     }
-
-    // Add upcoming streams
-    if (data.items && data.items.length > 0) {
-      // Get scheduled start times
+    if (data.items?.length > 0) {
       const ids = data.items.map(i => i.id.videoId).join(',');
-      const detailRes = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=liveStreamingDetails&id=${ids}&key=${YT_KEY}`);
-      const detailData = await detailRes.json();
+      const detailData = await ytFetch(`https://www.googleapis.com/youtube/v3/videos?part=liveStreamingDetails&id=${ids}&key=${YT_KEY}`, TTL);
       const timeMap = {};
-      for (const d of detailData.items) {
-        timeMap[d.id] = d.liveStreamingDetails?.scheduledStartTime;
-      }
-      for (const item of data.items) {
-        item.scheduledStart = timeMap[item.id.videoId];
-        events.push(item);
-      }
+      for (const d of (detailData.items || [])) timeMap[d.id] = d.liveStreamingDetails?.scheduledStartTime;
+      for (const item of data.items) { item.scheduledStart = timeMap[item.id.videoId]; events.push(item); }
     }
 
     if (events.length === 0) {
-      // Show recent past streams as reference
-      const pastRes = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${CHANNEL_ID}&eventType=completed&type=video&order=date&maxResults=5&key=${YT_KEY}`);
-      const pastData = await pastRes.json();
-      if (pastData.items && pastData.items.length > 0) {
+      const pastData = await ytFetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${CHANNEL_ID}&eventType=completed&type=video&order=date&maxResults=5&key=${YT_KEY}`, 30 * 60 * 1000);
+      if (pastData.items?.length > 0) {
         list.innerHTML = '';
         for (const item of pastData.items) {
           const date = new Date(item.snippet.publishedAt);
           const title = item.snippet.title.replace(/^\[LIVE\]\s*/i, '');
-          const url = 'https://www.youtube.com/watch?v=' + item.id.videoId;
-          list.innerHTML += buildEventRow(date, title, url, false, true);
+          list.innerHTML += buildEventRow(date, title, 'https://www.youtube.com/watch?v=' + item.id.videoId, false, true);
         }
-        // Update header to say "Recent Streams" since no upcoming
         document.querySelector('.events-title').textContent = 'Recent Streams';
       } else {
         list.innerHTML = '<div class="event-empty">No upcoming streams scheduled</div>';
@@ -673,12 +664,10 @@ async function fetchEvents() {
     for (const ev of events) {
       const date = ev.scheduledStart ? new Date(ev.scheduledStart) : new Date(ev.snippet.publishedAt);
       const title = ev.snippet.title.replace(/^\[LIVE\]\s*/i, '');
-      const url = 'https://www.youtube.com/watch?v=' + ev.id.videoId;
-      list.innerHTML += buildEventRow(date, title, url, ev.isLive, false);
+      list.innerHTML += buildEventRow(date, title, 'https://www.youtube.com/watch?v=' + ev.id.videoId, ev.isLive, false);
     }
-
   } catch (e) {
-    list.innerHTML = '<div class="event-empty">Unable to load events</div>';
+    list.innerHTML = '<div class="event-empty">Check back soon</div>';
   }
 }
 
