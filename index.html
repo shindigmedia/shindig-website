@@ -64,13 +64,7 @@ nav.scrolled{background:rgba(10,10,10,0.97);border-bottom:1px solid rgba(255,255
 }
 .tile:last-child{border-right:none;}
 .tile:hover{background:rgba(0,0,0,0.28);}
-.tile-accent{
-  position:absolute;top:0;left:0;right:0;height:2px;
-  background:#e63226;transform:scaleX(1);transform-origin:left;
-  opacity:0.28;
-  transition:opacity 0.3s,box-shadow 0.3s;
-}
-.tile:hover .tile-accent{opacity:1;box-shadow:0 0 12px rgba(230,50,38,0.6);}
+.tile-accent{display:none;}
 .tile::after{
   content:'';position:absolute;bottom:0;left:0;right:0;height:70%;
   background:linear-gradient(to top,rgba(0,0,0,0.6) 0%,transparent 100%);
