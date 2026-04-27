@@ -259,11 +259,11 @@ nav.scrolled{background:rgba(10,10,10,0.97);border-bottom:1px solid rgba(255,255
 <body>
 
 <nav id="nav">
-  <a href="shindig-launchpad-v3.html"><img class="nav-logo" src="logo-square.png" alt="The Shin Dig"></a>
+  <a href="/"><img class="nav-logo" src="logo-square.png" alt="The Shin Dig"></a>
   <ul class="nav-links">
     <li><a href="about.html">About</a></li>
     <li><a href="team.html">Team</a></li>
-    <li><a href="https://shindigmedia.com/collections/all" target="_blank">Shop</a></li>
+    <li><a href="https://shop.shindigmedia.com/collections/all" target="_blank">Shop</a></li>
     <li><a href="events.html">Events</a></li>
     <li><a href="faq.html">FAQ</a></li>
   </ul>
@@ -298,7 +298,7 @@ nav.scrolled{background:rgba(10,10,10,0.97);border-bottom:1px solid rgba(255,255
 
 <div class="tiles">
 
-  <a class="tile" href="https://shindigmedia.com/collections/all" target="_blank">
+  <a class="tile" href="https://shop.shindigmedia.com/collections/all" target="_blank">
     <div class="tile-accent"></div>
     <div class="tile-content"><div class="tile-icon">
         <!-- Shopping bag -->
@@ -374,7 +374,7 @@ nav.scrolled{background:rgba(10,10,10,0.97);border-bottom:1px solid rgba(255,255
 </div><!-- /hero-wrapper -->
 
 <div class="shop">
-  <div class="shop-header"><div class="shop-title">Shop</div><a class="shop-all" href="https://shindigmedia.com/collections/all" target="_blank">View all →</a></div>
+  <div class="shop-header"><div class="shop-title">Shop</div><a class="shop-all" href="https://shop.shindigmedia.com/collections/all" target="_blank">View all →</a></div>
   <div class="product-grid" id="product-grid">
     <div class="product"><div class="pimg"><div class="pimg-inner"><span class="pimg-ph">Loading…</span></div></div><div class="product-info"><span class="product-name">Loading…</span><span class="product-price"></span></div></div>
     <div class="product"><div class="pimg"><div class="pimg-inner"><span class="pimg-ph">Loading…</span></div></div><div class="product-info"><span class="product-name">Loading…</span><span class="product-price"></span></div></div>
@@ -742,7 +742,7 @@ async function fetchShopifyProducts() {
       const price = parseFloat(p.priceRange.minVariantPrice.amount);
       const currency = p.priceRange.minVariantPrice.currencyCode === 'GBP' ? '£' : '$';
       const soldOut = !p.availableForSale;
-      const url = `https://shindigmedia.com/products/${p.handle}`;
+      const url = `https://shop.shindigmedia.com/products/${p.handle}`;
 
       grid.innerHTML += `<a class="product" href="${url}" target="_blank" style="text-decoration:none;color:inherit;">
         <div class="pimg">
