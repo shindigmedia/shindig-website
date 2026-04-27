@@ -69,17 +69,24 @@ nav.scrolled{background:rgba(10,10,10,0.97);border-bottom:1px solid rgba(255,255
   transition:transform 0.35s cubic-bezier(0.22,1,0.36,1);
 }
 .tile:hover .tile-accent{transform:scaleX(1);}
+.tile::after{
+  content:'';position:absolute;bottom:0;left:0;right:0;height:70%;
+  background:linear-gradient(to top,rgba(0,0,0,0.6) 0%,transparent 100%);
+  pointer-events:none;z-index:0;
+}
 .tile-content{
   display:flex;flex-direction:column;
   flex:1;
   min-height:0;
+  position:relative;z-index:1;
 }
 .tile-icon{
   flex-shrink:0;
   width:32px;height:32px;
   overflow:hidden;
-  color:rgba(255,255,255,0.18);
-  transition:color 0.2s;
+  color:rgba(255,255,255,0.75);
+  filter:drop-shadow(0 1px 4px rgba(0,0,0,0.9));
+  transition:color 0.2s,filter 0.2s;
 }
 .tile-icon svg{
   width:32px !important;
@@ -87,7 +94,7 @@ nav.scrolled{background:rgba(10,10,10,0.97);border-bottom:1px solid rgba(255,255
   display:block;
   overflow:hidden;
 }
-.tile:hover .tile-icon{color:#e63226;}
+.tile:hover .tile-icon{color:#e63226;filter:drop-shadow(0 1px 6px rgba(230,50,38,0.5));}
 .tile-spacer{flex:1;}
 .tile-label{
   font-family:'Oswald',sans-serif;
@@ -95,6 +102,7 @@ nav.scrolled{background:rgba(10,10,10,0.97);border-bottom:1px solid rgba(255,255
   text-transform:uppercase;letter-spacing:0.04em;
   color:#fff;display:block;
   margin-bottom:5px;
+  text-shadow:0 1px 8px rgba(0,0,0,0.9);
   transition:color 0.2s;
 }
 .tile:hover .tile-label{color:#e63226;}
@@ -102,11 +110,12 @@ nav.scrolled{background:rgba(10,10,10,0.97);border-bottom:1px solid rgba(255,255
   font-family:'Barlow Condensed',sans-serif;
   font-size:13px;font-weight:600;
   letter-spacing:0.08em;text-transform:uppercase;
-  color:rgba(255,255,255,0.28);display:block;
+  color:rgba(255,255,255,0.8);display:block;
   margin-bottom:12px;line-height:1.5;
+  text-shadow:0 1px 6px rgba(0,0,0,0.95);
 }
 .tile-arrow{
-  font-size:16px;color:rgba(255,255,255,0.18);
+  font-size:16px;color:rgba(255,255,255,0.5);text-shadow:0 1px 4px rgba(0,0,0,0.9);
   transition:transform 0.25s cubic-bezier(0.22,1,0.36,1),color 0.2s;
   display:inline-block;
 }
