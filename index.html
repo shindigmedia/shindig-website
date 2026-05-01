@@ -314,7 +314,7 @@ nav.scrolled{background:rgba(10,10,10,0.97);border-bottom:1px solid rgba(255,255
     </div>
   </a>
 
-  <a class="tile" id="yt-tile" href="https://www.youtube.com/@theshindig" target="_blank">
+  <a class="tile" id="yt-tile" href="https://www.youtube.com/TheShinDig" target="_blank">
     <div class="tile-accent"></div>
     <div class="tile-content"><div class="tile-icon">
         <!-- Play / YouTube -->
@@ -599,7 +599,6 @@ async function fetchLatestVideo() {
       // Update tile
       ytLabel.textContent = 'YouTube';
       ytMeta.innerHTML = 'Latest video<br>' + vid.title.substring(0, 40) + (vid.title.length > 40 ? '…' : '');
-      ytTile.href = videoUrl;
 
       // Update section
       thumb.style.backgroundImage = 'url(' + thumbUrl + ')';
