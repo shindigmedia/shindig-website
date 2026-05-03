@@ -1,0 +1,6 @@
+name = "shindig-website"
+account_id = "6dd3aa979cec59d5bcef2dc8522f7967"
+compatibility_date = "2024-09-23"
+
+[assets]
+directory = "./"
