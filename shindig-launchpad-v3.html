@@ -185,22 +185,6 @@ nav.scrolled{background:rgba(10,10,10,0.97);border-bottom:1px solid rgba(255,255
 .partner-logo-img.logo-wide{height:42px;max-width:220px;}
 .partner-logo-img.logo-tall{height:66px;}
 
-/* CONTACT */
-.contact{padding:48px 32px 64px;max-width:640px;margin:0 auto;}
-.contact-header{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:24px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,0.07);}
-.contact-title{font-family:'Oswald',sans-serif;font-size:13px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:#fff;display:flex;align-items:center;gap:10px;}
-.contact-title::before{content:'';display:block;width:3px;height:13px;background:#ff0000;}
-.contact-form{display:flex;flex-direction:column;gap:12px;}
-.contact-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-.contact-field{display:flex;flex-direction:column;gap:6px;}
-.contact-field label{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.35);}
-.contact-field input,.contact-field textarea{background:#111;border:1px solid rgba(255,255,255,0.08);color:#f0f0f0;font-family:'Barlow',sans-serif;font-size:14px;padding:12px 14px;outline:none;transition:border-color 0.2s;resize:none;width:100%;}
-.contact-field input:focus,.contact-field textarea:focus{border-color:rgba(255,0,0,0.4);}
-.contact-field textarea{min-height:120px;}
-.contact-submit{font-family:'Oswald',sans-serif;font-size:13px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;background:#ff0000;color:#fff;border:none;padding:14px 32px;cursor:pointer;transition:background 0.2s;align-self:flex-start;}
-.contact-submit:hover{background:#cc0000;}
-.contact-success{display:none;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#ff0000;margin-top:8px;}
-
 /* FOOTER */
 .site-footer{padding:40px 32px 48px;border-top:1px solid rgba(255,255,255,0.07);text-align:center;}
 .footer-socials{display:flex;justify-content:center;gap:24px;margin-bottom:16px;}
@@ -424,30 +408,6 @@ nav.scrolled{background:rgba(10,10,10,0.97);border-bottom:1px solid rgba(255,255
     <img class="partner-logo-img" src="logos/uec.png" alt="UEC">
   </div>
 </div>
-
-<section class="contact">
-  <div class="contact-header">
-    <div class="contact-title">Contact Us</div>
-  </div>
-  <form class="contact-form" action="https://formspree.io/f/YOUR_FORM_ID" method="POST" id="contact-form">
-    <div class="contact-row">
-      <div class="contact-field">
-        <label for="cf-name">Name</label>
-        <input type="text" id="cf-name" name="name" placeholder="Your name" required>
-      </div>
-      <div class="contact-field">
-        <label for="cf-email">Email</label>
-        <input type="email" id="cf-email" name="email" placeholder="your@email.com" required>
-      </div>
-    </div>
-    <div class="contact-field">
-      <label for="cf-message">Message</label>
-      <textarea id="cf-message" name="message" placeholder="What's on your mind?" required></textarea>
-    </div>
-    <button type="submit" class="contact-submit">Send Message</button>
-    <p class="contact-success" id="contact-success">Thanks — we'll be in touch.</p>
-  </form>
-</section>
 
 <footer class="site-footer">
   <div class="footer-socials">
@@ -789,33 +749,6 @@ async function fetchShopifyProducts() {
 
 fetchShopifyProducts();
 
-// Contact form — AJAX submit so page doesn't redirect
-const contactForm = document.getElementById('contact-form');
-const contactSuccess = document.getElementById('contact-success');
-contactForm.addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const btn = contactForm.querySelector('.contact-submit');
-  btn.textContent = 'Sending…';
-  btn.disabled = true;
-  try {
-    const res = await fetch(contactForm.action, {
-      method: 'POST',
-      body: new FormData(contactForm),
-      headers: { 'Accept': 'application/json' }
-    });
-    if (res.ok) {
-      contactForm.reset();
-      contactSuccess.style.display = 'block';
-      btn.textContent = 'Sent';
-    } else {
-      btn.textContent = 'Send Message';
-      btn.disabled = false;
-    }
-  } catch {
-    btn.textContent = 'Send Message';
-    btn.disabled = false;
-  }
-});
 </script>
 
 <!-- Cloudflare Web Analytics --><script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "de8552bc6e2e4cb28af56c2796242c89"}'></script><!-- End Cloudflare Web Analytics -->
